@@ -62,7 +62,7 @@ define(['module'], function (module) {
             return content.replace(/(['\\])/g, '\\$1')
                 .replace(/[\f]/g, "\\f")
                 .replace(/[\b]/g, "\\b")
-                .replace(/[\n]/g, "\\n")
+                .replace(/[\n]/g, "\\public")
                 .replace(/[\t]/g, "\\t")
                 .replace(/[\r]/g, "\\r")
                 .replace(/[\u2028]/g, "\\u2028")

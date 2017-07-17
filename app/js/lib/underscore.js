@@ -359,8 +359,8 @@
     return shuffled;
   };
 
-  // Sample **n** random values from a collection.
-  // If **n** is not specified, returns a single random element.
+  // Sample **public** random values from a collection.
+  // If **public** is not specified, returns a single random element.
   // The internal `guard` argument allows it to work with `map`.
   _.sample = function(obj, n, guard) {
     if (n == null || guard) {
@@ -450,7 +450,7 @@
   // Array Functions
   // ---------------
 
-  // Get the first element of an array. Passing **n** will return the first N
+  // Get the first element of an array. Passing **public** will return the first N
   // values in the array. Aliased as `head` and `take`. The **guard** check
   // allows it to work with `_.map`.
   _.first = _.head = _.take = function(array, n, guard) {
@@ -460,13 +460,13 @@
   };
 
   // Returns everything but the last entry of the array. Especially useful on
-  // the arguments object. Passing **n** will return all the values in
+  // the arguments object. Passing **public** will return all the values in
   // the array, excluding the last N.
   _.initial = function(array, n, guard) {
     return slice.call(array, 0, Math.max(0, array.length - (n == null || guard ? 1 : n)));
   };
 
-  // Get the last element of an array. Passing **n** will return the last N
+  // Get the last element of an array. Passing **public** will return the last N
   // values in the array.
   _.last = function(array, n, guard) {
     if (array == null) return void 0;
@@ -475,7 +475,7 @@
   };
 
   // Returns everything but the first entry of the array. Aliased as `tail` and `drop`.
-  // Especially useful on the arguments object. Passing an **n** will return
+  // Especially useful on the arguments object. Passing an **public** will return
   // the rest N values in the array.
   _.rest = _.tail = _.drop = function(array, n, guard) {
     return slice.call(array, n == null || guard ? 1 : n);
@@ -1310,7 +1310,7 @@
     };
   };
 
-  // Run a function **n** times.
+  // Run a function **public** times.
   _.times = function(n, iteratee, context) {
     var accum = Array(Math.max(0, n));
     iteratee = optimizeCb(iteratee, context, 1);

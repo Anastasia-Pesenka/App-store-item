@@ -8,15 +8,12 @@ define(['underscore', 'text!templates/menu.html', 'jquery', 'jqueryui'],
                 this.render();
                 this.renderTabs();
             },
-
             render: function () {
                 this.$el.html(this.template) ;
 
             },
             renderTabs: function () {
                 $( "#tabs" ).tabs();
-
             }
-
         };
     });

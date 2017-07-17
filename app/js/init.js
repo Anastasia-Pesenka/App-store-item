@@ -5,7 +5,7 @@ requirejs.config({
         text: '../lib/text',
         jquery: '../lib/jquery',
         jqueryui: '../lib/jquery-ui',
-        firebase: 'https://www.gstatic.com/firebasejs/4.1.2/firebase'
+        firebase: 'https://www.gstatic.com/firebasejs/4.1.3/firebase'
     },
     config: {
         fb: {
@@ -22,6 +22,7 @@ requirejs.config({
             exports: 'firebase'
         }
     }
+
 });
 
 requirejs(['app'], function (app) {
