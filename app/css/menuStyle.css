@@ -1,0 +1,14 @@
+.tab-links a {
+    display: inline-block;
+    transition: all linear 0.5s;
+    text-decoration: none;
+}
+
+.active {
+    display: block;
+}
+
+.no-active {
+    display: none;
+}
+

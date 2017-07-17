@@ -1,0 +1,36 @@
+[debug] [2017-07-17T12:41:29.972Z] ----------------------------------------------------------------------
+[debug] [2017-07-17T12:41:29.976Z] Command:      C:\Program Files\nodejs\node.exe C:\Users\13564357г\AppData\Roaming\npm\node_modules\firebase-tools\bin\firebase serve
+[debug] [2017-07-17T12:41:29.976Z] CLI Version:  3.9.1
+[debug] [2017-07-17T12:41:29.976Z] Platform:     win32
+[debug] [2017-07-17T12:41:29.977Z] Node Version: v6.11.0
+[debug] [2017-07-17T12:41:29.977Z] Time:         Mon Jul 17 2017 15:41:29 GMT+0300 (Восточная Европа (лето))
+[debug] [2017-07-17T12:41:29.978Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2017-07-17T12:41:30.002Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2017-07-17T12:41:30.002Z] > authorizing via signed-in user
+[debug] [2017-07-17T12:41:30.005Z] > refreshing access token with scopes: ["email","https://www.googleapis.com/auth/cloud-platform","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","openid"]
+[debug] [2017-07-17T12:41:30.006Z] >>> HTTP REQUEST POST https://www.googleapis.com/oauth2/v3/token { refresh_token: '1/FVQVJRmi4Bfs2QvobbtcTgQ6dJT9C3zVaTJ3HAt9nb1G5MIqngd5vA393bVQtlZP',
+  client_id: '563584335869-fgrhgmd47bqnekij5i8b5pr03ho849e6.apps.googleusercontent.com',
+  client_secret: 'j9iVZfS8kkCEFUPaAeJV0sAi',
+  grant_type: 'refresh_token',
+  scope: 'email https://www.googleapis.com/auth/cloud-platform https://www.googleapis.com/auth/cloudplatformprojects.readonly https://www.googleapis.com/auth/firebase openid' } 
+ Mon Jul 17 2017 15:41:30 GMT+0300 (Восточная Европа (лето))
+[debug] [2017-07-17T12:41:30.399Z] <<< HTTP RESPONSE 200
+[debug] [2017-07-17T12:41:30.425Z] >>> HTTP REQUEST GET https://admin.firebase.com/v1/projects/myfinalproject-b58cf  
+ Mon Jul 17 2017 15:41:30 GMT+0300 (Восточная Европа (лето))
+[debug] [2017-07-17T12:41:31.535Z] <<< HTTP RESPONSE 200
+[debug] [2017-07-17T12:41:31.536Z] >>> HTTP REQUEST GET https://admin.firebase.com/v1/database/myfinalproject-b58cf/tokens  
+ Mon Jul 17 2017 15:41:31 GMT+0300 (Восточная Европа (лето))
+[debug] [2017-07-17T12:41:32.280Z] <<< HTTP RESPONSE 200
+[info] 
+[info] === Serving from 'C:\Users\13564357г\Desktop\my-project'...
+[info] 
+[debug] [2017-07-17T12:41:32.284Z] >>> HTTP REQUEST GET https://cloudresourcemanager.googleapis.com/v1/projects/myfinalproject-b58cf  
+ Mon Jul 17 2017 15:41:32 GMT+0300 (Восточная Европа (лето))
+[debug] [2017-07-17T12:41:33.246Z] <<< HTTP RESPONSE 200
+[debug] [2017-07-17T12:41:33.247Z] >>> HTTP REQUEST GET https://mobilesdk-pa.googleapis.com/v1/projects/323458626540/clients/_:getWebAppConfig  
+ Mon Jul 17 2017 15:41:33 GMT+0300 (Восточная Европа (лето))
+[debug] [2017-07-17T12:41:34.063Z] <<< HTTP RESPONSE 200
+[info] i  hosting: Serving hosting files from: public
+[info] +  hosting: Local server: http://localhost:5000
+
