@@ -1,4 +1,4 @@
-define(['radio', 'modules/menu', 'fb'], function (radio, menu, fb) {
+define(['fb', 'radio', 'modules/menu'], function (fb, radio, menu) {
         return {
             init: function () {
                 fb.init();

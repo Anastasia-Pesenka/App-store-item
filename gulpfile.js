@@ -159,7 +159,13 @@ gulp.task('dev:js', function (cb) {
             underscore: '../lib/underscore',
             text: '../lib/text',
             jquery: '../lib/jquery',
-            jqueryui: '../lib/jquery-ui'
+            jqueryui: '../lib/jquery-ui',
+            firebase: 'https://www.gstatic.com/firebasejs/4.1.3/firebase'
+        },
+        shim: {
+            firebase: {
+                exports: 'firebase'
+            }
         }
     }, function (buildResponse) {
         console.log('build response', buildResponse);
