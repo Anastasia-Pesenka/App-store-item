@@ -6,15 +6,24 @@
     </div>
     <div class="nav-right nav-menu">
         <ul style="margin: 20px">
-        <li style="display: inline-block"><a class="nav-item is-tab" href="#tabs-1">Главная</a></li>
-        <li style="display: inline-block"><a class="nav-item is-tab" href="#tabs-2">О сервисе</a></li>
+            <li style="display: inline-block"><a class="nav-item is-tab" href="#tabs-1">Главная</a></li>
+            <li style="display: inline-block"><a class="nav-item is-tab" href="#tabs-2">О сервисе</a></li>
         </ul>
 
+
+        <!--<% if(user) %>-->
+        <!--<span><%user%></span>-->
         <span class="nav-item">
-                <a class="button is-default">
+                <a class="button is-default log-out">
+                  Выйти
+                </a>
+        </span>
+        <!--<% else %>-->
+        <span class="nav-item">
+                <a class="button is-default log-in">
                   Войти
                 </a>
-              </span>
+        </span>
 
     </div>
 </div>
