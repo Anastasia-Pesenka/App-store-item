@@ -6,7 +6,6 @@ define(['fb', 'radio', 'underscore', 'text!templates/menu.html', 'jquery', 'jque
                 this.$el = $(".menu");
                 this.render(null);
                 this.setupEvents();
-
             },
             render: function (user) {
                 this.$el.html(this.template({user : user})) ;
