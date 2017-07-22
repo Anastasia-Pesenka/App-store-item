@@ -4,21 +4,17 @@ define(['fb', 'radio', 'underscore', 'text!templates/menu.html', 'jquery', 'jque
             init: function () {
                 this.template = _.template(menuTpl);
                 this.$el = $(".menu");
-                this.render();
-                this.renderTabs();
-                // this.setupEvents();
+                this.render(null);
+                this.setupEvents();
 
             },
-            render: function () {
-                this.$el.html(this.template()) ;
-            },
-            renderTabs : function () {
-                $( "#tabs" ).tabs();
+            render: function (user) {
+                this.$el.html(this.template({user : user})) ;
             },
             setupEvents : function () {
                 radio.on('userSign', function (user) {
                     console.log(user);
-                    // this.render(user);
+                    this.render(user);
                 }.bind(this));
                 this.$el.on('click', this.clickHandler.bind(this));
             },

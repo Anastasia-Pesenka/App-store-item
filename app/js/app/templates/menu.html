@@ -3,27 +3,29 @@
         <a class="nav-item">
             <img src="img/logo.png" alt="Description">
         </a>
+        <% if(user) {%>
+        <div class="nav-item"><h5 class="title is-5"><%- user.displayName%></h5></div>
+        <%}%>
     </div>
     <div class="nav-right nav-menu">
-        <ul style="margin: 20px">
-            <li style="display: inline-block"><a class="nav-item is-tab" href="#tabs-1">Главная</a></li>
-            <li style="display: inline-block"><a class="nav-item is-tab" href="#tabs-2">О сервисе</a></li>
-        </ul>
+            <a class="nav-item is-tab" href="#home">Главная</a>
+            <a class="nav-item is-tab" href="#about">О сервисе</a>
+        <% if(user)%>
 
 
-        <!--<% if(user) %>-->
-        <!--<span><%user%></span>-->
         <span class="nav-item">
-                <a class="button is-default log-out">
+                <a class="button is-default log-out" href="#home">
                   Выйти
                 </a>
         </span>
-        <!--<% else %>-->
+        <%else%>
+
         <span class="nav-item">
-                <a class="button is-default log-in">
+                <a class="button is-default log-in" href="#profile">
                   Войти
                 </a>
         </span>
+
 
     </div>
 </div>

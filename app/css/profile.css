@@ -1,0 +1,21 @@
+
+.nav.menu .nav-item .icon-btn {
+    border: 3px solid #2EB398;
+    border-radius: 90px;
+    padding: 5px 7px;
+    color: #2EB398;
+}
+.nav.menu .nav-item .icon-btn.thin {
+    padding: 5px 8px;
+}
+.nav.menu .nav-item.is-active .icon-btn {
+    color: #2EB398;
+    border: 3px solid #2EB398;
+}
+.nav.menu .nav-item .icon-btn .fa {
+    font-size: 20px;
+    color: #2EB398;
+}
+.nav.menu .nav-item.is-active .icon-btn .fa {
+    color: #2EB398;
+}
