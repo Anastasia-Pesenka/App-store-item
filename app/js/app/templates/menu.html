@@ -8,10 +8,13 @@
         <%}%>
     </div>
     <div class="nav-right nav-menu">
+        <% if(user) %>
+        <a class="nav-item is-tab" href="#profile">Главная</a>
+        <%else {%>
             <a class="nav-item is-tab" href="#home">Главная</a>
+        <%}%>
             <a class="nav-item is-tab" href="#about">О сервисе</a>
         <% if(user)%>
-
 
         <span class="nav-item">
                 <a class="button is-default log-out" href="#home">
