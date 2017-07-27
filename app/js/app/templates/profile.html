@@ -1,9 +1,9 @@
 <div class="container">
     <% if (user) {%>
-
+        <% var count = 0; %>
     <div class="columns">
-        <% for (var id in items){ %>
-        <div class="column is-4">
+            <% for (var id in items){ %>
+                <div class="column is-4">
             <div class="card">
                 <div class="card-image">
                     <figure class="image is-4by3">
@@ -22,108 +22,9 @@
                 </footer>
             </div>
         </div>
-        <% } %>
-        <div class="column is-4">
-            <div class="card">
-                <div class="card-image">
-                    <figure class="image is-4by3">
-                        <img src="https://placehold.it/1280x960" alt="Image">
-                    </figure>
-                </div>
-                <div class="card-content">
-                    <div class="panel-block-item ">
-              <span class="likes">
-                nastya
-              </span>
-                    </div>
-                </div>
-                <footer class="card-footer">
-                    <a class="card-footer-item">Delete</a>
-                </footer>
-            </div>
-        </div>
-
-        <div class="column is-4">
-            <div class="card">
-                <div class="card-image">
-                    <figure class="image is-4by3">
-                        <img src="https://placehold.it/1280x960" alt="Image">
-                    </figure>
-                </div>
-                <div class="card-content">
-                    <div class="panel-block-item ">
-              <span class="likes">
-                nastya
-              </span>
-                    </div>
-                </div>
-                <footer class="card-footer">
-                    <a class="card-footer-item">Delete</a>
-                </footer>
-            </div>
-        </div>
+                <% count++; %>
+            <% } %>
     </div>
-    <div class="columns">
 
-        <div class="column is-4">
-            <div class="card">
-                <div class="card-image">
-                    <figure class="image is-4by3">
-                        <img src="https://placehold.it/1280x960" alt="Image">
-                    </figure>
-                </div>
-                <div class="card-content">
-                    <div class="panel-block-item ">
-              <span class="likes">
-                nastya
-              </span>
-                    </div>
-                </div>
-                <footer class="card-footer">
-                    <a class="card-footer-item">Delete</a>
-                </footer>
-            </div>
-        </div>
-
-        <div class="column is-4">
-            <div class="card">
-                <div class="card-image">
-                    <figure class="image is-4by3">
-                        <img src="https://placehold.it/1280x960" alt="Image">
-                    </figure>
-                </div>
-                <div class="card-content">
-                    <div class="panel-block-item ">
-              <span class="likes">
-                nastya
-              </span>
-                    </div>
-                </div>
-                <footer class="card-footer">
-                    <a class="card-footer-item">Delete</a>
-                </footer>
-            </div>
-        </div>
-
-        <div class="column is-4">
-            <div class="card">
-                <div class="card-image">
-                    <figure class="image is-4by3">
-                        <img src="https://placehold.it/1280x960" alt="Image">
-                    </figure>
-                </div>
-                <div class="card-content">
-                    <div class="panel-block-item ">
-              <span class="likes">
-                nastya
-              </span>
-                    </div>
-                </div>
-                <footer class="card-footer">
-                    <a class="card-footer-item">Delete</a>
-                </footer>
-            </div>
-        </div>
-    </div>
     <% } %>
 </div>

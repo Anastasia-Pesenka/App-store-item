@@ -2,6 +2,7 @@ define(['fb', 'radio', 'underscore', 'text!templates/profile.html', 'jquery', 'j
     function (fb, radio, _,  profileTpl, $) {
         return {
             init : function () {
+
                 this.template = _.template(profileTpl);
                 this.$el = $(".profile");
                 this.items = {};
