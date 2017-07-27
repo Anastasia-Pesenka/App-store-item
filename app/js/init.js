@@ -13,7 +13,7 @@ requirejs.config({
             authDomain: "myfinalproject-b58cf.firebaseapp.com",
             databaseURL: "https://myfinalproject-b58cf.firebaseio.com",
             projectId: "myfinalproject-b58cf",
-            storageBucket: "",
+            storageBucket: "myfinalproject-b58cf.appspot.com",
             messagingSenderId: "323458626540"
         }
     },

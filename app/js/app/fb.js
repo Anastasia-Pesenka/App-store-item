@@ -1,7 +1,32 @@
-define(['firebase', 'module', 'radio'], function (firebase, module, radio) {
+define(['firebase', 'module', 'radio', 'util'], function (firebase, module, radio, util) {
     return {
         init: function () {
             firebase.initializeApp(module.config());
+            this.authenticated = firebase.auth().currentUser || null;
+            this.setupEvents();
+        },
+        setupEvents: function () {
+            firebase.auth().onAuthStateChanged(function (user) {
+                if (user) {
+                    this.setCurrentUser(user);
+                    this.listenerDB();
+                } else {
+                    this.setCurrentUser(null);
+                }
+            }.bind(this));
+        }
+        ,
+        setCurrentUser: function (user) {
+            this.authenticated = user;
+            radio.trigger('auth/changed', user);
+        },
+        getCurrentUser: function () {
+            return this.authenticated;
+        },
+        listenerDB : function () {
+            firebase.database().ref('/users/' + this.authenticated.uid + '/info').on('value', function (snapshot) {
+                radio.trigger('item/got', snapshot.val());
+            });
         },
         signIn: function () {
             var provider = new firebase.auth.GoogleAuthProvider();
@@ -32,6 +57,104 @@ define(['firebase', 'module', 'radio'], function (firebase, module, radio) {
 
                 // An error happened.
             });
-        }
+        },
+        saveFile: function (file) {
+            var id = util.generateId();
+            var metadata = {
+                contentType: file.type,
+                customMetadata: {
+                    id: id
+                }
+            };
+            var uploadTask = firebase.storage().ref('images/' + file.name).put(file, metadata);
+            uploadTask.on(firebase.storage.TaskEvent.STATE_CHANGED,
+                this.uploadingFileProgressHandler,
+                this.uploadingFileErrorHandler,
+                this.uploadingFileSuccessHandler.bind({fb: this, uploadTask: uploadTask}));
+        },
+
+        /**
+         * Progress handler of file uploading
+         * @param {Object} snapshot
+         */
+        uploadingFileProgressHandler: function (snapshot) {
+            var progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+            console.log('Upload is ' + progress + '% done');
+            switch (snapshot.state) {
+                case firebase.storage.TaskState.PAUSED:
+                    console.log('Upload is paused');
+                    break;
+                case firebase.storage.TaskState.RUNNING:
+                    console.log('Upload is running');
+                    break;
+            }
+        },
+
+        /**
+         * Error handler of file uploading
+         * @param {Object} error
+         */
+        uploadingFileErrorHandler: function (error) {
+            switch (error.code) {
+                case 'storage/unauthorized':
+                    break;
+                case 'storage/canceled':
+                    break;
+                case 'storage/unknown':
+                    break;
+            }
+        },
+
+        /**
+         * Success handler of file uploading
+         */
+        uploadingFileSuccessHandler: function () {
+            var fileData = {
+                downloadURL: this.uploadTask.snapshot.downloadURL,
+                fullPath: this.uploadTask.snapshot.metadata.fullPath
+            };
+            radio.trigger('img/save', fileData)
+        },
+
+        /**
+         * Saves information about image in DB
+         * @param {Object} fileData
+         * @param {string} fileData.downloadURL - Download url in storage
+         * @param {string} fileData.fullPath - Reference for image in storage
+         */
+        saveRefOnFile: function (fileData) {
+            return fileData;
+        },
+
+        /**
+         * Deletes image from storage and reference in DB
+         * @param {string} id
+         * @param {string} path
+         */
+        deleteRefOnFile: function (id, path) {
+            firebase.storage().ref(path).delete()
+                .then(function () {
+
+                }.bind(this))
+                .catch(function (error) {
+                    console.log(error);
+                });
+            var ref = firebase.database().ref('users/' + this.getCurrentUser().uid + '/settings/images/' + id);
+            ref.remove();
+        },
+
+        /**
+         * Listens changes of images in DB
+         */
+        listenImagesSettings: function () {
+            firebase.database().ref('/users/' + this.authenticated.uid + '/settings/images/').on('value', function (snapshot) {
+                radio.trigger('settingsImages/got', snapshot.val());
+            });
+        },
+
+
+        saveItemInfo: function (id, data) {
+            firebase.database().ref('users/' + this.authenticated.uid + '/info/' + id).set(data);
+        },
     }
 });

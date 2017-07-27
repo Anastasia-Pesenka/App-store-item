@@ -1,16 +1,70 @@
 <div class="container">
-    <div class="nav menu is-centered">
-        <div class="field">
-            <div class="control">
-                <input class="input is-primary" type="text" placeholder="Введите описание">
+    <% if (user) {%>
+
+    <div class="columns">
+        <% for (var id in items){ %>
+        <div class="column is-4">
+            <div class="card">
+                <div class="card-image">
+                    <figure class="image is-4by3">
+                        <img src="<%= items[id].ref.downloadURL %>" alt="Image">
+                    </figure>
+                </div>
+                <div class="card-content">
+                    <div class="panel-block-item ">
+              <span class="likes">
+                <%- items[id].description %>
+              </span>
+                    </div>
+                </div>
+                <footer class="card-footer">
+                    <a class="card-footer-item">Edit</a>
+                    <a class="card-footer-item">Delete</a>
+                </footer>
             </div>
         </div>
-        <a class="nav-item is-tab ">
-        <span class="icon-btn">
-            <i class="fa fa-plus"></i>
-        </span>
-            <strong style="color: white; padding-left: 7px">Добавить</strong>
-        </a>
+        <% } %>
+        <div class="column is-4">
+            <div class="card">
+                <div class="card-image">
+                    <figure class="image is-4by3">
+                        <img src="https://placehold.it/1280x960" alt="Image">
+                    </figure>
+                </div>
+                <div class="card-content">
+                    <div class="panel-block-item ">
+              <span class="likes">
+                nastya
+              </span>
+                    </div>
+                </div>
+                <footer class="card-footer">
+                    <a class="card-footer-item">Edit</a>
+                    <a class="card-footer-item">Delete</a>
+                </footer>
+            </div>
+        </div>
+
+        <div class="column is-4">
+            <div class="card">
+                <div class="card-image">
+                    <figure class="image is-4by3">
+                        <img src="https://placehold.it/1280x960" alt="Image">
+                    </figure>
+                </div>
+                <div class="card-content">
+                    <div class="panel-block-item ">
+              <span class="likes">
+                nastya
+              </span>
+                    </div>
+                </div>
+                <footer class="card-footer">
+                    <a class="card-footer-item">Edit</a>
+                    <a class="card-footer-item">Delete</a>
+                </footer>
+            </div>
+        </div>
     </div>
     <div class="columns">
 
@@ -77,69 +131,5 @@
             </div>
         </div>
     </div>
-    <div class="columns">
-
-        <div class="column is-4">
-            <div class="card">
-                <div class="card-image">
-                    <figure class="image is-4by3">
-                        <img src="https://placehold.it/1280x960" alt="Image">
-                    </figure>
-                </div>
-                <div class="card-content">
-                    <div class="panel-block-item ">
-              <span class="likes">
-                nastya
-              </span>
-                    </div>
-                </div>
-                <footer class="card-footer">
-                    <a class="card-footer-item">Edit</a>
-                    <a class="card-footer-item">Delete</a>
-                </footer>
-            </div>
-        </div>
-
-        <div class="column is-4">
-            <div class="card">
-                <div class="card-image">
-                    <figure class="image is-4by3">
-                        <img src="https://placehold.it/1280x960" alt="Image">
-                    </figure>
-                </div>
-                <div class="card-content">
-                    <div class="panel-block-item ">
-              <span class="likes">
-                nastya
-              </span>
-                    </div>
-                </div>
-                <footer class="card-footer">
-                    <a class="card-footer-item">Edit</a>
-                    <a class="card-footer-item">Delete</a>
-                </footer>
-            </div>
-        </div>
-
-        <div class="column is-4">
-            <div class="card">
-                <div class="card-image">
-                    <figure class="image is-4by3">
-                        <img src="https://placehold.it/1280x960" alt="Image">
-                    </figure>
-                </div>
-                <div class="card-content">
-                    <div class="panel-block-item ">
-              <span class="likes">
-                nastya
-              </span>
-                    </div>
-                </div>
-                <footer class="card-footer">
-                    <a class="card-footer-item">Edit</a>
-                    <a class="card-footer-item">Delete</a>
-                </footer>
-            </div>
-        </div>
-    </div>
+    <% } %>
 </div>

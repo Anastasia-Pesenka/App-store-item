@@ -1,4 +1,4 @@
-define(['modules/home', 'modules/tabAbout', 'modules/profile'], function (home, about, profile) {
+define(['modules/home', 'modules/tabAbout', 'modules/profile', 'modules/addingItemMenu'], function (home, about, profile, addingItemMenu) {
     return {
         currentRout: {},
         routes: [
@@ -28,10 +28,12 @@ define(['modules/home', 'modules/tabAbout', 'modules/profile'], function (home, 
                 match: 'profile',
                 onEnter: function () {
                     console.log('onEnter home');
+                    addingItemMenu.init();
                     profile.init();
                 },
                 onLeave: function () {
                     console.log('onLeave home');
+                    addingItemMenu.clear();
                     profile.clear();
                 }
             },

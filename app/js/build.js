@@ -21,10 +21,43 @@ define('radio',[],function () {
     }
 });
 
-define('fb',['firebase', 'module', 'radio'], function (firebase, module, radio) {
+define('util',[],function () {
+    return {
+        generateId: function () {
+            return 'id' + (new Date()).getTime();
+        }
+    };
+});
+
+define('fb',['firebase', 'module', 'radio', 'util'], function (firebase, module, radio, util) {
     return {
         init: function () {
             firebase.initializeApp(module.config());
+            this.authenticated = firebase.auth().currentUser || null;
+            this.setupEvents();
+        },
+        setupEvents: function () {
+            firebase.auth().onAuthStateChanged(function (user) {
+                if (user) {
+                    this.setCurrentUser(user);
+                    this.listenerDB();
+                } else {
+                    this.setCurrentUser(null);
+                }
+            }.bind(this));
+        }
+        ,
+        setCurrentUser: function (user) {
+            this.authenticated = user;
+            radio.trigger('auth/changed', user);
+        },
+        getCurrentUser: function () {
+            return this.authenticated;
+        },
+        listenerDB : function () {
+            firebase.database().ref('/users/' + this.authenticated.uid + '/info').on('value', function (snapshot) {
+                radio.trigger('item/got', snapshot.val());
+            });
         },
         signIn: function () {
             var provider = new firebase.auth.GoogleAuthProvider();
@@ -55,7 +88,105 @@ define('fb',['firebase', 'module', 'radio'], function (firebase, module, radio) 
 
                 // An error happened.
             });
-        }
+        },
+        saveFile: function (file) {
+            var id = util.generateId();
+            var metadata = {
+                contentType: file.type,
+                customMetadata: {
+                    id: id
+                }
+            };
+            var uploadTask = firebase.storage().ref('images/' + file.name).put(file, metadata);
+            uploadTask.on(firebase.storage.TaskEvent.STATE_CHANGED,
+                this.uploadingFileProgressHandler,
+                this.uploadingFileErrorHandler,
+                this.uploadingFileSuccessHandler.bind({fb: this, uploadTask: uploadTask}));
+        },
+
+        /**
+         * Progress handler of file uploading
+         * @param {Object} snapshot
+         */
+        uploadingFileProgressHandler: function (snapshot) {
+            var progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+            console.log('Upload is ' + progress + '% done');
+            switch (snapshot.state) {
+                case firebase.storage.TaskState.PAUSED:
+                    console.log('Upload is paused');
+                    break;
+                case firebase.storage.TaskState.RUNNING:
+                    console.log('Upload is running');
+                    break;
+            }
+        },
+
+        /**
+         * Error handler of file uploading
+         * @param {Object} error
+         */
+        uploadingFileErrorHandler: function (error) {
+            switch (error.code) {
+                case 'storage/unauthorized':
+                    break;
+                case 'storage/canceled':
+                    break;
+                case 'storage/unknown':
+                    break;
+            }
+        },
+
+        /**
+         * Success handler of file uploading
+         */
+        uploadingFileSuccessHandler: function () {
+            var fileData = {
+                downloadURL: this.uploadTask.snapshot.downloadURL,
+                fullPath: this.uploadTask.snapshot.metadata.fullPath
+            };
+            radio.trigger('img/save', fileData)
+        },
+
+        /**
+         * Saves information about image in DB
+         * @param {Object} fileData
+         * @param {string} fileData.downloadURL - Download url in storage
+         * @param {string} fileData.fullPath - Reference for image in storage
+         */
+        saveRefOnFile: function (fileData) {
+            return fileData;
+        },
+
+        /**
+         * Deletes image from storage and reference in DB
+         * @param {string} id
+         * @param {string} path
+         */
+        deleteRefOnFile: function (id, path) {
+            firebase.storage().ref(path).delete()
+                .then(function () {
+
+                }.bind(this))
+                .catch(function (error) {
+                    console.log(error);
+                });
+            var ref = firebase.database().ref('users/' + this.getCurrentUser().uid + '/settings/images/' + id);
+            ref.remove();
+        },
+
+        /**
+         * Listens changes of images in DB
+         */
+        listenImagesSettings: function () {
+            firebase.database().ref('/users/' + this.authenticated.uid + '/settings/images/').on('value', function (snapshot) {
+                radio.trigger('settingsImages/got', snapshot.val());
+            });
+        },
+
+
+        saveItemInfo: function (id, data) {
+            firebase.database().ref('users/' + this.authenticated.uid + '/info/' + id).set(data);
+        },
     }
 });
 //     Underscore.js 1.8.3
@@ -2057,7 +2188,7 @@ define('modules/tabAbout',['fb', 'radio', 'underscore', 'text!templates/tabAbout
         }
     });
 
-define('text!templates/profile.html',[],function () { return '<div class="container">\r\n    <div class="nav menu is-centered">\r\n        <div class="field">\r\n            <div class="control">\r\n                <input class="input is-primary" type="text" placeholder="Введите описание">\r\n            </div>\r\n        </div>\r\n        <a class="nav-item is-tab ">\r\n        <span class="icon-btn">\r\n            <i class="fa fa-plus"></i>\r\n        </span>\r\n            <strong style="color: white; padding-left: 7px">Добавить</strong>\r\n        </a>\r\n    </div>\r\n    <div class="columns">\r\n\r\n        <div class="column is-4">\r\n            <div class="card">\r\n                <div class="card-image">\r\n                    <figure class="image is-4by3">\r\n                        <img src="https://placehold.it/1280x960" alt="Image">\r\n                    </figure>\r\n                </div>\r\n                <div class="card-content">\r\n                    <div class="panel-block-item ">\r\n              <span class="likes">\r\n                nastya\r\n              </span>\r\n                    </div>\r\n                </div>\r\n                <footer class="card-footer">\r\n                    <a class="card-footer-item">Edit</a>\r\n                    <a class="card-footer-item">Delete</a>\r\n                </footer>\r\n            </div>\r\n        </div>\r\n\r\n        <div class="column is-4">\r\n            <div class="card">\r\n                <div class="card-image">\r\n                    <figure class="image is-4by3">\r\n                        <img src="https://placehold.it/1280x960" alt="Image">\r\n                    </figure>\r\n                </div>\r\n                <div class="card-content">\r\n                    <div class="panel-block-item ">\r\n              <span class="likes">\r\n                nastya\r\n              </span>\r\n                    </div>\r\n                </div>\r\n                <footer class="card-footer">\r\n                    <a class="card-footer-item">Edit</a>\r\n                    <a class="card-footer-item">Delete</a>\r\n                </footer>\r\n            </div>\r\n        </div>\r\n\r\n        <div class="column is-4">\r\n            <div class="card">\r\n                <div class="card-image">\r\n                    <figure class="image is-4by3">\r\n                        <img src="https://placehold.it/1280x960" alt="Image">\r\n                    </figure>\r\n                </div>\r\n                <div class="card-content">\r\n                    <div class="panel-block-item ">\r\n              <span class="likes">\r\n                nastya\r\n              </span>\r\n                    </div>\r\n                </div>\r\n                <footer class="card-footer">\r\n                    <a class="card-footer-item">Edit</a>\r\n                    <a class="card-footer-item">Delete</a>\r\n                </footer>\r\n            </div>\r\n        </div>\r\n    </div>\r\n    <div class="columns">\r\n\r\n        <div class="column is-4">\r\n            <div class="card">\r\n                <div class="card-image">\r\n                    <figure class="image is-4by3">\r\n                        <img src="https://placehold.it/1280x960" alt="Image">\r\n                    </figure>\r\n                </div>\r\n                <div class="card-content">\r\n                    <div class="panel-block-item ">\r\n              <span class="likes">\r\n                nastya\r\n              </span>\r\n                    </div>\r\n                </div>\r\n                <footer class="card-footer">\r\n                    <a class="card-footer-item">Edit</a>\r\n                    <a class="card-footer-item">Delete</a>\r\n                </footer>\r\n            </div>\r\n        </div>\r\n\r\n        <div class="column is-4">\r\n            <div class="card">\r\n                <div class="card-image">\r\n                    <figure class="image is-4by3">\r\n                        <img src="https://placehold.it/1280x960" alt="Image">\r\n                    </figure>\r\n                </div>\r\n                <div class="card-content">\r\n                    <div class="panel-block-item ">\r\n              <span class="likes">\r\n                nastya\r\n              </span>\r\n                    </div>\r\n                </div>\r\n                <footer class="card-footer">\r\n                    <a class="card-footer-item">Edit</a>\r\n                    <a class="card-footer-item">Delete</a>\r\n                </footer>\r\n            </div>\r\n        </div>\r\n\r\n        <div class="column is-4">\r\n            <div class="card">\r\n                <div class="card-image">\r\n                    <figure class="image is-4by3">\r\n                        <img src="https://placehold.it/1280x960" alt="Image">\r\n                    </figure>\r\n                </div>\r\n                <div class="card-content">\r\n                    <div class="panel-block-item ">\r\n              <span class="likes">\r\n                nastya\r\n              </span>\r\n                    </div>\r\n                </div>\r\n                <footer class="card-footer">\r\n                    <a class="card-footer-item">Edit</a>\r\n                    <a class="card-footer-item">Delete</a>\r\n                </footer>\r\n            </div>\r\n        </div>\r\n    </div>\r\n</div>';});
+define('text!templates/profile.html',[],function () { return '<div class="container">\r\n    <% if (user) {%>\r\n\r\n    <div class="columns">\r\n        <% for (var id in items){ %>\r\n        <div class="column is-4">\r\n            <div class="card">\r\n                <div class="card-image">\r\n                    <figure class="image is-4by3">\r\n                        <img src="<%= items[id].ref.downloadURL %>" alt="Image">\r\n                    </figure>\r\n                </div>\r\n                <div class="card-content">\r\n                    <div class="panel-block-item ">\r\n              <span class="likes">\r\n                <%- items[id].description %>\r\n              </span>\r\n                    </div>\r\n                </div>\r\n                <footer class="card-footer">\r\n                    <a class="card-footer-item">Edit</a>\r\n                    <a class="card-footer-item">Delete</a>\r\n                </footer>\r\n            </div>\r\n        </div>\r\n        <% } %>\r\n        <div class="column is-4">\r\n            <div class="card">\r\n                <div class="card-image">\r\n                    <figure class="image is-4by3">\r\n                        <img src="https://placehold.it/1280x960" alt="Image">\r\n                    </figure>\r\n                </div>\r\n                <div class="card-content">\r\n                    <div class="panel-block-item ">\r\n              <span class="likes">\r\n                nastya\r\n              </span>\r\n                    </div>\r\n                </div>\r\n                <footer class="card-footer">\r\n                    <a class="card-footer-item">Edit</a>\r\n                    <a class="card-footer-item">Delete</a>\r\n                </footer>\r\n            </div>\r\n        </div>\r\n\r\n        <div class="column is-4">\r\n            <div class="card">\r\n                <div class="card-image">\r\n                    <figure class="image is-4by3">\r\n                        <img src="https://placehold.it/1280x960" alt="Image">\r\n                    </figure>\r\n                </div>\r\n                <div class="card-content">\r\n                    <div class="panel-block-item ">\r\n              <span class="likes">\r\n                nastya\r\n              </span>\r\n                    </div>\r\n                </div>\r\n                <footer class="card-footer">\r\n                    <a class="card-footer-item">Edit</a>\r\n                    <a class="card-footer-item">Delete</a>\r\n                </footer>\r\n            </div>\r\n        </div>\r\n    </div>\r\n    <div class="columns">\r\n\r\n        <div class="column is-4">\r\n            <div class="card">\r\n                <div class="card-image">\r\n                    <figure class="image is-4by3">\r\n                        <img src="https://placehold.it/1280x960" alt="Image">\r\n                    </figure>\r\n                </div>\r\n                <div class="card-content">\r\n                    <div class="panel-block-item ">\r\n              <span class="likes">\r\n                nastya\r\n              </span>\r\n                    </div>\r\n                </div>\r\n                <footer class="card-footer">\r\n                    <a class="card-footer-item">Edit</a>\r\n                    <a class="card-footer-item">Delete</a>\r\n                </footer>\r\n            </div>\r\n        </div>\r\n\r\n        <div class="column is-4">\r\n            <div class="card">\r\n                <div class="card-image">\r\n                    <figure class="image is-4by3">\r\n                        <img src="https://placehold.it/1280x960" alt="Image">\r\n                    </figure>\r\n                </div>\r\n                <div class="card-content">\r\n                    <div class="panel-block-item ">\r\n              <span class="likes">\r\n                nastya\r\n              </span>\r\n                    </div>\r\n                </div>\r\n                <footer class="card-footer">\r\n                    <a class="card-footer-item">Edit</a>\r\n                    <a class="card-footer-item">Delete</a>\r\n                </footer>\r\n            </div>\r\n        </div>\r\n\r\n        <div class="column is-4">\r\n            <div class="card">\r\n                <div class="card-image">\r\n                    <figure class="image is-4by3">\r\n                        <img src="https://placehold.it/1280x960" alt="Image">\r\n                    </figure>\r\n                </div>\r\n                <div class="card-content">\r\n                    <div class="panel-block-item ">\r\n              <span class="likes">\r\n                nastya\r\n              </span>\r\n                    </div>\r\n                </div>\r\n                <footer class="card-footer">\r\n                    <a class="card-footer-item">Edit</a>\r\n                    <a class="card-footer-item">Delete</a>\r\n                </footer>\r\n            </div>\r\n        </div>\r\n    </div>\r\n    <% } %>\r\n</div>';});
 
 define('modules/profile',['fb', 'radio', 'underscore', 'text!templates/profile.html', 'jquery', 'jqueryui'],
     function (fb, radio, _,  profileTpl, $) {
@@ -2065,17 +2196,72 @@ define('modules/profile',['fb', 'radio', 'underscore', 'text!templates/profile.h
             init : function () {
                 this.template = _.template(profileTpl);
                 this.$el = $(".profile");
+                this.items = {};
                 this.render();
+                this.setupEvents();
+            },
+            render : function (items) {
+                var user = fb.getCurrentUser();
+                this.$el.html(this.template({items : items, user : user})) ;
+            },
+            clear : function () {
+                this.$el.html('') ;
+            },
+            setupEvents : function () {
+                radio.on('item/got', this.setItem.bind(this));
+            },
+            setItem : function (items) {
+                debugger;
+                this.render(items);
+            }
+        }
+    });
+
+define('text!templates/addingItemMenu.html',[],function () { return '<div class="nav menu is-centered">\r\n    <div class="field">\r\n        <div class="control">\r\n            <input class="input is-primary item-info" type="text" placeholder="Введите описание">\r\n            <input type="file" class="input-files" multiple accept="image/jpeg,image/png">\r\n        </div>\r\n\r\n    </div>\r\n    <a class="nav-item is-tab">\r\n        <span class="icon-btn add">\r\n            <i class="fa fa-plus"></i>\r\n        </span>\r\n        <strong class="add" style="color: white; padding-left: 7px">Добавить</strong>\r\n    </a>\r\n</div>';});
+
+define('modules/addingItemMenu',['fb', 'radio', 'util', 'underscore', 'text!templates/addingItemMenu.html', 'jquery', 'jqueryui'],
+    function (fb, radio, util, _,  addingItemMenuTpl, $) {
+        return {
+            init : function () {
+                this.template = _.template(addingItemMenuTpl);
+                this.$el = $(".addingItemMenu");
+                this.render();
+                this.setupEvents();
             },
             render : function () {
                 this.$el.html(this.template()) ;
             },
             clear : function () {
                 this.$el.html('') ;
-            }
+            },
+            setupEvents : function () {
+                this.$el.on('click', this.addHandler.bind(this));
+            },
+            addHandler : function (e) {
+                if($(e.target).is('.add')){
+                    var input= $('.input-files').get(0);
+
+                    var file = input.files;
+                    for (var i = 0; i < file.length; i++) {
+                        fb.saveFile(file[i]);
+                    }
+                    radio.on('img/save', this.addTask);
+                }
+            },
+            addTask: function (imgRef) {
+                var info = $('.item-info').get(0).value;
+                if (imgRef && info) {
+                    var id = util.generateId();
+                    var data = {
+                        description: info,
+                        ref: imgRef
+                    };
+                    fb.saveItemInfo(id, data);
+                }
+            },
         }
     });
-define('router',['modules/home', 'modules/tabAbout', 'modules/profile'], function (home, about, profile) {
+define('router',['modules/home', 'modules/tabAbout', 'modules/profile', 'modules/addingItemMenu'], function (home, about, profile, addingItemMenu) {
     return {
         currentRout: {},
         routes: [
@@ -2105,10 +2291,12 @@ define('router',['modules/home', 'modules/tabAbout', 'modules/profile'], functio
                 match: 'profile',
                 onEnter: function () {
                     console.log('onEnter home');
+                    addingItemMenu.init();
                     profile.init();
                 },
                 onLeave: function () {
                     console.log('onLeave home');
+                    addingItemMenu.clear();
                     profile.clear();
                 }
             },
@@ -2192,6 +2380,7 @@ define('app',['router', 'fb', 'radio', 'modules/menu', 'modules/home'], function
                 fb.init();
                 menu.init();
                 router.init();
+
             }
         };
     });
@@ -2211,7 +2400,7 @@ requirejs.config({
             authDomain: "myfinalproject-b58cf.firebaseapp.com",
             databaseURL: "https://myfinalproject-b58cf.firebaseio.com",
             projectId: "myfinalproject-b58cf",
-            storageBucket: "",
+            storageBucket: "myfinalproject-b58cf.appspot.com",
             messagingSenderId: "323458626540"
         }
     },

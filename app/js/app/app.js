@@ -4,6 +4,7 @@ define(['router', 'fb', 'radio', 'modules/menu', 'modules/home'], function (rout
                 fb.init();
                 menu.init();
                 router.init();
+
             }
         };
     });
