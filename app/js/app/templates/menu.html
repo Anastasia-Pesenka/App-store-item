@@ -7,13 +7,18 @@
         <div class="nav-item"><h5 class="title is-5"><%- user.displayName%></h5></div>
         <%}%>
     </div>
-    <div class="nav-right nav-menu">
+    <span class="nav-toggle">
+              <span></span>
+              <span></span>
+              <span></span>
+            </span>
+    <div class="nav-right nav-menu my-menu">
         <% if(user) %>
-        <a class="nav-item is-tab" href="#profile">Главная</a>
+        <a class="nav-item" href="#profile">Главная</a>
         <%else {%>
-            <a class="nav-item is-tab" href="#home">Главная</a>
+            <a class="nav-item " href="#home">Главная</a>
         <%}%>
-            <a class="nav-item is-tab" href="#about">О сервисе</a>
+            <a class="nav-item " href="#about">О сервисе</a>
         <% if(user)%>
 
         <span class="nav-item">
@@ -28,8 +33,6 @@
                   Войти
                 </a>
         </span>
-
-
     </div>
 </div>
 

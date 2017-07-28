@@ -25,6 +25,7 @@ define(['fb', 'radio', 'util', 'underscore', 'text!templates/addingItemMenu.html
                         fb.saveFile(file[i]);
                     }
                     radio.on('img/save', this.addTask);
+
                 }
             },
             addTask: function (imgRef) {
@@ -37,6 +38,8 @@ define(['fb', 'radio', 'util', 'underscore', 'text!templates/addingItemMenu.html
                     };
                     fb.saveItemInfo(id, data);
                 }
-            },
+                $(".input-files").val("");
+                $(".item-info").val("");
+            }
         }
     });

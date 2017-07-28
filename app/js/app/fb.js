@@ -33,6 +33,11 @@ define(['firebase', 'module', 'radio', 'util'], function (firebase, module, radi
                 radio.trigger('item/got', snapshot.val());
             });
         },
+        getDBSnapshot : function () {
+            firebase.database().ref('/users/' + this.authenticated.uid + '/info').once('value').then(function(snapshot) {
+                return snapshot.val()
+            });
+        },
         signIn: function () {
             var provider = new firebase.auth.GoogleAuthProvider();
             firebase.auth().signInWithPopup(provider).then(function (result) {
@@ -40,9 +45,6 @@ define(['firebase', 'module', 'radio', 'util'], function (firebase, module, radi
                 var token = result.credential.accessToken;
                 // The signed-in user info.
                 var user = result.user;
-
-                this.userIsAuth = user;
-                radio.trigger('userSign', this.userIsAuth);
             }.bind(this)).catch(function (error) {
                 // Handle Errors here.
                 debugger;
@@ -57,7 +59,6 @@ define(['firebase', 'module', 'radio', 'util'], function (firebase, module, radi
         signOut : function () {
             firebase.auth().signOut().then(function() {
                 this.userIsAuth=null;
-                radio.trigger('userSign', this.userIsAuth);
             }.bind(this)).catch(function(error) {
 
                 // An error happened.

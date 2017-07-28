@@ -64,6 +64,11 @@ define('fb',['firebase', 'module', 'radio', 'util'], function (firebase, module,
                 radio.trigger('item/got', snapshot.val());
             });
         },
+        getDBSnapshot : function () {
+            firebase.database().ref('/users/' + this.authenticated.uid + '/info').once('value').then(function(snapshot) {
+                return snapshot.val()
+            });
+        },
         signIn: function () {
             var provider = new firebase.auth.GoogleAuthProvider();
             firebase.auth().signInWithPopup(provider).then(function (result) {
@@ -71,9 +76,6 @@ define('fb',['firebase', 'module', 'radio', 'util'], function (firebase, module,
                 var token = result.credential.accessToken;
                 // The signed-in user info.
                 var user = result.user;
-
-                this.userIsAuth = user;
-                radio.trigger('userSign', this.userIsAuth);
             }.bind(this)).catch(function (error) {
                 // Handle Errors here.
                 debugger;
@@ -88,7 +90,6 @@ define('fb',['firebase', 'module', 'radio', 'util'], function (firebase, module,
         signOut : function () {
             firebase.auth().signOut().then(function() {
                 this.userIsAuth=null;
-                radio.trigger('userSign', this.userIsAuth);
             }.bind(this)).catch(function(error) {
 
                 // An error happened.
@@ -2169,7 +2170,7 @@ define('modules/tabAbout',['fb', 'radio', 'underscore', 'text!templates/tabAbout
         }
     });
 
-define('text!templates/profile.html',[],function () { return '<div class="container">\r\n    <% if (user) {%>\r\n        <% var count = 0; %>\r\n\r\n            <% for (var id in items){ %>\r\n        <% if( count===0 ) { %>\r\n        <div class="columns">\r\n            <% } %>\r\n            <div class="column is-4" >\r\n                <div class="card">\r\n                    <div class="card-image">\r\n                        <figure class="image is-4by3">\r\n                            <img src="<%= items[id].ref.downloadURL %>" alt="Image">\r\n                        </figure>\r\n                    </div>\r\n                    <div class="card-content">\r\n                        <div class="panel-block-item ">\r\n              <span class="likes">\r\n                <%- items[id].description %>\r\n              </span>\r\n                        </div>\r\n                    </div>\r\n                    <footer class="card-footer">\r\n                        <a class="card-footer-item del" data-id="<%= id %>" data-path="<%= items[id].ref.fullPath %>" >Delete</a>\r\n                    </footer>\r\n                </div>\r\n            </div>\r\n            <% count++; %>\r\n            <% if( count%3===0 && count!=0 ) { %>\r\n        </div><div class="columns">\r\n        <% } %>\r\n\r\n            <% } %>\r\n\r\n\r\n    <% } %>\r\n</div>';});
+define('text!templates/profile.html',[],function () { return '<div class="container is-centered">\r\n    <% if (user) {%>\r\n        <% var count = 0; %>\r\n\r\n            <% for (var id in items){ %>\r\n        <% if( count===0 ) { %>\r\n        <div class="columns">\r\n            <% } %>\r\n            <div class="column is-4" >\r\n                <div class="card">\r\n                    <div class="card-image">\r\n                        <figure class="image is-4by3">\r\n                            <img src="<%= items[id].ref.downloadURL %>" alt="Image">\r\n                        </figure>\r\n                    </div>\r\n                    <div class="card-content">\r\n                        <div class="panel-block-item ">\r\n              <span class="likes">\r\n                <%- items[id].description %>\r\n              </span>\r\n                        </div>\r\n                    </div>\r\n                    <footer class="card-footer">\r\n                        <a class="card-footer-item del" data-id="<%= id %>" data-path="<%= items[id].ref.fullPath %>" >Delete</a>\r\n                    </footer>\r\n                </div>\r\n            </div>\r\n            <% count++; %>\r\n            <% if( count%3===0 && count!=0 ) { %>\r\n        </div><div class="columns">\r\n        <% } %>\r\n\r\n            <% } %>\r\n\r\n\r\n    <% } %>\r\n</div>';});
 
 define('modules/profile',['fb', 'radio', 'underscore', 'text!templates/profile.html', 'jquery', 'jqueryui'],
     function (fb, radio, _,  profileTpl, $) {
@@ -2177,11 +2178,10 @@ define('modules/profile',['fb', 'radio', 'underscore', 'text!templates/profile.h
             init : function () {
                 this.template = _.template(profileTpl);
                 this.$el = $(".profile");
-                this.render();
                 this.setupEvents();
+                this.render();
             },
-            render : function (items) {
-                var user = fb.getCurrentUser();
+            render : function (items, user) {
                 this.$el.html(this.template({items : items, user : user})) ;
             },
             clear : function () {
@@ -2189,10 +2189,15 @@ define('modules/profile',['fb', 'radio', 'underscore', 'text!templates/profile.h
             },
             setupEvents : function () {
                 this.$el.on('click', this.clickHandler.bind(this));
+                radio.on('auth/changed', function (user) {
+                    items = fb.getDBSnapshot();
+                    this.render(items, user);
+                }.bind(this));
                 radio.on('item/got', this.setItem.bind(this));
             },
             setItem : function (items) {
-                this.render(items);
+                var user = fb.getCurrentUser();
+                this.render(items, user);
             },
             clickHandler : function (e) {
                 if($(e.target).is('.del')) {
@@ -2204,7 +2209,7 @@ define('modules/profile',['fb', 'radio', 'underscore', 'text!templates/profile.h
         }
     });
 
-define('text!templates/addingItemMenu.html',[],function () { return '<div class="nav menu is-centered">\r\n    <div class="field">\r\n        <div class="control">\r\n            <input class="input is-primary item-info" type="text" placeholder="Введите описание">\r\n            <input type="file" class="input-files" multiple accept="image/jpeg,image/png">\r\n        </div>\r\n\r\n    </div>\r\n    <a class="nav-item is-tab">\r\n        <span class="icon-btn add">\r\n            <i class="fa fa-plus"></i>\r\n        </span>\r\n        <strong class="add" style="color: white; padding-left: 7px">Добавить</strong>\r\n    </a>\r\n</div>';});
+define('text!templates/addingItemMenu.html',[],function () { return '<div class="nav menu is-centered">\r\n\r\n    <div class="field">\r\n        <div class="control">\r\n            <input class="input is-primary item-info" type="text" placeholder="Введите описание">\r\n            <input type="file" class="input-files" multiple accept="image/jpeg,image/png">\r\n        </div>\r\n    </div>\r\n\r\n\r\n\r\n<a class="nav-item is-tab " >\r\n        <span class="icon-btn add">\r\n            <i class="fa fa-plus"></i>\r\n        </span>\r\n        <strong class="add" style="color: white; padding-left: 7px">Добавить</strong>\r\n    </a>\r\n\r\n</div>';});
 
 define('modules/addingItemMenu',['fb', 'radio', 'util', 'underscore', 'text!templates/addingItemMenu.html', 'jquery', 'jqueryui'],
     function (fb, radio, util, _,  addingItemMenuTpl, $) {
@@ -2233,6 +2238,7 @@ define('modules/addingItemMenu',['fb', 'radio', 'util', 'underscore', 'text!temp
                         fb.saveFile(file[i]);
                     }
                     radio.on('img/save', this.addTask);
+
                 }
             },
             addTask: function (imgRef) {
@@ -2245,7 +2251,9 @@ define('modules/addingItemMenu',['fb', 'radio', 'util', 'underscore', 'text!temp
                     };
                     fb.saveItemInfo(id, data);
                 }
-            },
+                $(".input-files").val("");
+                $(".item-info").val("");
+            }
         }
     });
 define('router',['modules/home', 'modules/tabAbout', 'modules/profile', 'modules/addingItemMenu'], function (home, about, profile, addingItemMenu) {
@@ -2287,19 +2295,19 @@ define('router',['modules/home', 'modules/tabAbout', 'modules/profile', 'modules
             },
             {
                 match: 'profile',
-                onEnter: function () {
+                onEnter: function (user) {
                     console.log('onEnter home');
                     addingItemMenu.init();
-                    profile.init();
+                    profile.init(user);
                 },
                 onLeave: function () {
                     console.log('onLeave home');
                     addingItemMenu.clear();
                     profile.clear();
                 }
-            },
+            }
         ],
-        init: function () {
+        init: function (user) {
             window.addEventListener('hashchange', function () {
                     this.handleUrl(window.location.hash);
                 }.bind(this)
@@ -2338,23 +2346,22 @@ define('router',['modules/home', 'modules/tabAbout', 'modules/profile', 'modules
 });
 
 
-define('text!templates/menu.html',[],function () { return '<div class="container">\n    <div class="nav-left">\n        <a class="nav-item">\n            <img src="img/logo.png" alt="Description">\n        </a>\n        <% if(user) {%>\n        <div class="nav-item"><h5 class="title is-5"><%- user.displayName%></h5></div>\n        <%}%>\n    </div>\n    <div class="nav-right nav-menu">\n        <% if(user) %>\n        <a class="nav-item is-tab" href="#profile">Главная</a>\n        <%else {%>\n            <a class="nav-item is-tab" href="#home">Главная</a>\n        <%}%>\n            <a class="nav-item is-tab" href="#about">О сервисе</a>\n        <% if(user)%>\n\n        <span class="nav-item">\n                <a class="button is-default log-out" href="#home">\n                  Выйти\n                </a>\n        </span>\n        <%else%>\n\n        <span class="nav-item">\n                <a class="button is-default log-in" href="#profile">\n                  Войти\n                </a>\n        </span>\n\n\n    </div>\n</div>\n\n';});
+define('text!templates/menu.html',[],function () { return '<div class="container">\n    <div class="nav-left">\n        <a class="nav-item">\n            <img src="img/logo.png" alt="Description">\n        </a>\n        <% if(user) {%>\n        <div class="nav-item"><h5 class="title is-5"><%- user.displayName%></h5></div>\n        <%}%>\n    </div>\n    <span class="nav-toggle">\n              <span></span>\n              <span></span>\n              <span></span>\n            </span>\n    <div class="nav-right nav-menu my-menu">\n        <% if(user) %>\n        <a class="nav-item" href="#profile">Главная</a>\n        <%else {%>\n            <a class="nav-item " href="#home">Главная</a>\n        <%}%>\n            <a class="nav-item " href="#about">О сервисе</a>\n        <% if(user)%>\n\n        <span class="nav-item">\n                <a class="button is-default log-out" href="#home">\n                  Выйти\n                </a>\n        </span>\n        <%else%>\n\n        <span class="nav-item">\n                <a class="button is-default log-in" href="#profile">\n                  Войти\n                </a>\n        </span>\n    </div>\n</div>\n\n';});
 
 define('modules/menu',['fb', 'radio', 'underscore', 'text!templates/menu.html', 'jquery', 'jqueryui'],
     function (fb, radio, _,  menuTpl, $) {
         return {
-            init: function () {
+            init: function (user) {
                 this.template = _.template(menuTpl);
                 this.$el = $(".menu");
-                this.render(null);
+                this.render(user);
                 this.setupEvents();
             },
             render: function (user) {
                 this.$el.html(this.template({user : user})) ;
             },
             setupEvents : function () {
-                radio.on('userSign', function (user) {
-                    console.log(user);
+                radio.on('auth/changed', function (user) {
                     this.render(user);
                 }.bind(this));
                 this.$el.on('click', this.clickHandler.bind(this));
@@ -2366,6 +2373,11 @@ define('modules/menu',['fb', 'radio', 'underscore', 'text!templates/menu.html', 
                 if($(e.target).is('.log-out')){
                     fb.signOut();
                 }
+                if($(e.target).is('.nav-toggle')){
+                    $(e.target).toggleClass("is-active");
+                    $(".my-menu").toggleClass("is-active");
+                }
+
 
             }
 
@@ -2379,8 +2391,8 @@ define('app',['router', 'fb', 'radio', 'modules/menu'], function (router, fb, ra
                 fb.init();
             },
             initializeModules : function (user) {
-                menu.init();
-                router.init();
+                menu.init(user);
+                router.init(user);
             }
         };
     });

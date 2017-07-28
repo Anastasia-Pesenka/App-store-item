@@ -5,8 +5,8 @@ define(['router', 'fb', 'radio', 'modules/menu'], function (router, fb, radio, m
                 fb.init();
             },
             initializeModules : function (user) {
-                menu.init();
-                router.init();
+                menu.init(user);
+                router.init(user);
             }
         };
     });

@@ -37,19 +37,19 @@ define(['modules/home', 'modules/tabAbout', 'modules/profile', 'modules/addingIt
             },
             {
                 match: 'profile',
-                onEnter: function () {
+                onEnter: function (user) {
                     console.log('onEnter home');
                     addingItemMenu.init();
-                    profile.init();
+                    profile.init(user);
                 },
                 onLeave: function () {
                     console.log('onLeave home');
                     addingItemMenu.clear();
                     profile.clear();
                 }
-            },
+            }
         ],
-        init: function () {
+        init: function (user) {
             window.addEventListener('hashchange', function () {
                     this.handleUrl(window.location.hash);
                 }.bind(this)
