@@ -2180,9 +2180,8 @@ define('modules/profile',['fb', 'radio', 'underscore', 'text!templates/profile.h
                 this.render();
                 this.setupEvents();
             },
-            render : function () {
+            render : function (items) {
                 var user = fb.getCurrentUser();
-                var items = this.items;
                 this.$el.html(this.template({items : items, user : user})) ;
             },
             clear : function () {
@@ -2193,8 +2192,7 @@ define('modules/profile',['fb', 'radio', 'underscore', 'text!templates/profile.h
                 radio.on('item/got', this.setItem.bind(this));
             },
             setItem : function (items) {
-                this.items=items;
-                this.render();
+                this.render(items);
             },
             clickHandler : function (e) {
                 if($(e.target).is('.del')) {

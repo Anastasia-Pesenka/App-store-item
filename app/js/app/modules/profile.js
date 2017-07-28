@@ -7,9 +7,8 @@ define(['fb', 'radio', 'underscore', 'text!templates/profile.html', 'jquery', 'j
                 this.render();
                 this.setupEvents();
             },
-            render : function () {
+            render : function (items) {
                 var user = fb.getCurrentUser();
-                var items = this.items;
                 this.$el.html(this.template({items : items, user : user})) ;
             },
             clear : function () {
@@ -20,8 +19,7 @@ define(['fb', 'radio', 'underscore', 'text!templates/profile.html', 'jquery', 'j
                 radio.on('item/got', this.setItem.bind(this));
             },
             setItem : function (items) {
-                this.items=items;
-                this.render();
+                this.render(items);
             },
             clickHandler : function (e) {
                 if($(e.target).is('.del')) {
