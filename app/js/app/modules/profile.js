@@ -2,26 +2,33 @@ define(['fb', 'radio', 'underscore', 'text!templates/profile.html', 'jquery', 'j
     function (fb, radio, _,  profileTpl, $) {
         return {
             init : function () {
-
                 this.template = _.template(profileTpl);
                 this.$el = $(".profile");
-                this.items = {};
                 this.render();
                 this.setupEvents();
             },
-            render : function (items) {
+            render : function () {
                 var user = fb.getCurrentUser();
+                var items = this.items;
                 this.$el.html(this.template({items : items, user : user})) ;
             },
             clear : function () {
                 this.$el.html('') ;
             },
             setupEvents : function () {
+                this.$el.on('click', this.clickHandler.bind(this));
                 radio.on('item/got', this.setItem.bind(this));
             },
             setItem : function (items) {
-                debugger;
-                this.render(items);
+                this.items=items;
+                this.render();
+            },
+            clickHandler : function (e) {
+                if($(e.target).is('.del')) {
+                    var id = $(e.target).attr("data-id");
+                    var path = $(e.target).attr("data-path");
+                    fb.deleteItem(id, path);
+                }
             }
         }
     });

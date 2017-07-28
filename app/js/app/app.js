@@ -1,10 +1,12 @@
-define(['router', 'fb', 'radio', 'modules/menu', 'modules/home'], function (router, fb, radio, menu, home) {
+define(['router', 'fb', 'radio', 'modules/menu'], function (router, fb, radio, menu) {
         return {
             init: function () {
+                radio.on('fb/initialized', this.initializeModules);
                 fb.init();
+            },
+            initializeModules : function (user) {
                 menu.init();
                 router.init();
-
             }
         };
     });

@@ -3,6 +3,7 @@ define(['firebase', 'module', 'radio', 'util'], function (firebase, module, radi
         init: function () {
             firebase.initializeApp(module.config());
             this.authenticated = firebase.auth().currentUser || null;
+            this.initialized = false;
             this.setupEvents();
         },
         setupEvents: function () {
@@ -12,6 +13,10 @@ define(['firebase', 'module', 'radio', 'util'], function (firebase, module, radi
                     this.listenerDB();
                 } else {
                     this.setCurrentUser(null);
+                }
+                if (!this.initialized) {
+                    this.initialized = true;
+                    radio.trigger('fb/initialized', user);
                 }
             }.bind(this));
         }
@@ -116,22 +121,11 @@ define(['firebase', 'module', 'radio', 'util'], function (firebase, module, radi
             radio.trigger('img/save', fileData)
         },
 
-        /**
-         * Saves information about image in DB
-         * @param {Object} fileData
-         * @param {string} fileData.downloadURL - Download url in storage
-         * @param {string} fileData.fullPath - Reference for image in storage
-         */
-        saveRefOnFile: function (fileData) {
-            return fileData;
-        },
 
-        /**
-         * Deletes image from storage and reference in DB
-         * @param {string} id
-         * @param {string} path
-         */
-        deleteRefOnFile: function (id, path) {
+        saveItemInfo: function (id, data) {
+            firebase.database().ref('users/' + this.authenticated.uid + '/info/' + id).set(data);
+        },
+        deleteItem : function (id, path) {
             firebase.storage().ref(path).delete()
                 .then(function () {
 
@@ -139,22 +133,9 @@ define(['firebase', 'module', 'radio', 'util'], function (firebase, module, radi
                 .catch(function (error) {
                     console.log(error);
                 });
-            var ref = firebase.database().ref('users/' + this.getCurrentUser().uid + '/settings/images/' + id);
+            var ref = firebase.database().ref('/users/' + this.authenticated.uid + '/info/' + id);
             ref.remove();
-        },
 
-        /**
-         * Listens changes of images in DB
-         */
-        listenImagesSettings: function () {
-            firebase.database().ref('/users/' + this.authenticated.uid + '/settings/images/').on('value', function (snapshot) {
-                radio.trigger('settingsImages/got', snapshot.val());
-            });
-        },
-
-
-        saveItemInfo: function (id, data) {
-            firebase.database().ref('users/' + this.authenticated.uid + '/info/' + id).set(data);
-        },
+        }
     }
 });

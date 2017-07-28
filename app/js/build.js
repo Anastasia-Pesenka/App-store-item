@@ -34,6 +34,7 @@ define('fb',['firebase', 'module', 'radio', 'util'], function (firebase, module,
         init: function () {
             firebase.initializeApp(module.config());
             this.authenticated = firebase.auth().currentUser || null;
+            this.initialized = false;
             this.setupEvents();
         },
         setupEvents: function () {
@@ -43,6 +44,10 @@ define('fb',['firebase', 'module', 'radio', 'util'], function (firebase, module,
                     this.listenerDB();
                 } else {
                     this.setCurrentUser(null);
+                }
+                if (!this.initialized) {
+                    this.initialized = true;
+                    radio.trigger('fb/initialized', user);
                 }
             }.bind(this));
         }
@@ -147,22 +152,11 @@ define('fb',['firebase', 'module', 'radio', 'util'], function (firebase, module,
             radio.trigger('img/save', fileData)
         },
 
-        /**
-         * Saves information about image in DB
-         * @param {Object} fileData
-         * @param {string} fileData.downloadURL - Download url in storage
-         * @param {string} fileData.fullPath - Reference for image in storage
-         */
-        saveRefOnFile: function (fileData) {
-            return fileData;
-        },
 
-        /**
-         * Deletes image from storage and reference in DB
-         * @param {string} id
-         * @param {string} path
-         */
-        deleteRefOnFile: function (id, path) {
+        saveItemInfo: function (id, data) {
+            firebase.database().ref('users/' + this.authenticated.uid + '/info/' + id).set(data);
+        },
+        deleteItem : function (id, path) {
             firebase.storage().ref(path).delete()
                 .then(function () {
 
@@ -170,23 +164,10 @@ define('fb',['firebase', 'module', 'radio', 'util'], function (firebase, module,
                 .catch(function (error) {
                     console.log(error);
                 });
-            var ref = firebase.database().ref('users/' + this.getCurrentUser().uid + '/settings/images/' + id);
+            var ref = firebase.database().ref('/users/' + this.authenticated.uid + '/info/' + id);
             ref.remove();
-        },
 
-        /**
-         * Listens changes of images in DB
-         */
-        listenImagesSettings: function () {
-            firebase.database().ref('/users/' + this.authenticated.uid + '/settings/images/').on('value', function (snapshot) {
-                radio.trigger('settingsImages/got', snapshot.val());
-            });
-        },
-
-
-        saveItemInfo: function (id, data) {
-            firebase.database().ref('users/' + this.authenticated.uid + '/info/' + id).set(data);
-        },
+        }
     }
 });
 //     Underscore.js 1.8.3
@@ -2188,32 +2169,39 @@ define('modules/tabAbout',['fb', 'radio', 'underscore', 'text!templates/tabAbout
         }
     });
 
-define('text!templates/profile.html',[],function () { return '<div class="container">\r\n    <% if (user) {%>\r\n        <% var count = 0; %>\r\n    <div class="columns">\r\n            <% for (var id in items){ %>\r\n                <div class="column is-4">\r\n            <div class="card">\r\n                <div class="card-image">\r\n                    <figure class="image is-4by3">\r\n                        <img src="<%= items[id].ref.downloadURL %>" alt="Image">\r\n                    </figure>\r\n                </div>\r\n                <div class="card-content">\r\n                    <div class="panel-block-item ">\r\n              <span class="likes">\r\n                <%- items[id].description %>\r\n              </span>\r\n                    </div>\r\n                </div>\r\n                <footer class="card-footer">\r\n                    <a class="card-footer-item">Delete</a>\r\n                </footer>\r\n            </div>\r\n        </div>\r\n                <% count++; %>\r\n            <% } %>\r\n    </div>\r\n\r\n    <% } %>\r\n</div>';});
+define('text!templates/profile.html',[],function () { return '<div class="container">\r\n    <% if (user) {%>\r\n        <% var count = 0; %>\r\n\r\n            <% for (var id in items){ %>\r\n        <% if( count===0 ) { %>\r\n        <div class="columns">\r\n            <% } %>\r\n            <div class="column is-4" >\r\n                <div class="card">\r\n                    <div class="card-image">\r\n                        <figure class="image is-4by3">\r\n                            <img src="<%= items[id].ref.downloadURL %>" alt="Image">\r\n                        </figure>\r\n                    </div>\r\n                    <div class="card-content">\r\n                        <div class="panel-block-item ">\r\n              <span class="likes">\r\n                <%- items[id].description %>\r\n              </span>\r\n                        </div>\r\n                    </div>\r\n                    <footer class="card-footer">\r\n                        <a class="card-footer-item del" data-id="<%= id %>" data-path="<%= items[id].ref.fullPath %>" >Delete</a>\r\n                    </footer>\r\n                </div>\r\n            </div>\r\n            <% count++; %>\r\n            <% if( count%3===0 && count!=0 ) { %>\r\n        </div><div class="columns">\r\n        <% } %>\r\n\r\n            <% } %>\r\n\r\n\r\n    <% } %>\r\n</div>';});
 
 define('modules/profile',['fb', 'radio', 'underscore', 'text!templates/profile.html', 'jquery', 'jqueryui'],
     function (fb, radio, _,  profileTpl, $) {
         return {
             init : function () {
-
                 this.template = _.template(profileTpl);
                 this.$el = $(".profile");
-                this.items = {};
                 this.render();
                 this.setupEvents();
             },
-            render : function (items) {
+            render : function () {
                 var user = fb.getCurrentUser();
+                var items = this.items;
                 this.$el.html(this.template({items : items, user : user})) ;
             },
             clear : function () {
                 this.$el.html('') ;
             },
             setupEvents : function () {
+                this.$el.on('click', this.clickHandler.bind(this));
                 radio.on('item/got', this.setItem.bind(this));
             },
             setItem : function (items) {
-                debugger;
-                this.render(items);
+                this.items=items;
+                this.render();
+            },
+            clickHandler : function (e) {
+                if($(e.target).is('.del')) {
+                    var id = $(e.target).attr("data-id");
+                    var path = $(e.target).attr("data-path");
+                    fb.deleteItem(id, path);
+                }
             }
         }
     });
@@ -2266,6 +2254,17 @@ define('router',['modules/home', 'modules/tabAbout', 'modules/profile', 'modules
     return {
         currentRout: {},
         routes: [
+            {
+                match: '',
+                onEnter: function () {
+                    console.log('onEnter home');
+                    home.init();
+                },
+                onLeave: function () {
+                    console.log('onLeave home');
+                    home.clear();
+                }
+            },
             {
                 match: 'home',
                 onEnter: function () {
@@ -2375,13 +2374,15 @@ define('modules/menu',['fb', 'radio', 'underscore', 'text!templates/menu.html', 
         }
     });
 
-define('app',['router', 'fb', 'radio', 'modules/menu', 'modules/home'], function (router, fb, radio, menu, home) {
+define('app',['router', 'fb', 'radio', 'modules/menu'], function (router, fb, radio, menu) {
         return {
             init: function () {
+                radio.on('fb/initialized', this.initializeModules);
                 fb.init();
+            },
+            initializeModules : function (user) {
                 menu.init();
                 router.init();
-
             }
         };
     });

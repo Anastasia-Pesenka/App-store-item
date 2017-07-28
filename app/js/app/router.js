@@ -3,6 +3,17 @@ define(['modules/home', 'modules/tabAbout', 'modules/profile', 'modules/addingIt
         currentRout: {},
         routes: [
             {
+                match: '',
+                onEnter: function () {
+                    console.log('onEnter home');
+                    home.init();
+                },
+                onLeave: function () {
+                    console.log('onLeave home');
+                    home.clear();
+                }
+            },
+            {
                 match: 'home',
                 onEnter: function () {
                     console.log('onEnter home');
