@@ -5,6 +5,8 @@ requirejs.config({
         text: '../lib/text',
         jquery: '../lib/jquery',
         jqueryui: '../lib/jquery-ui',
+        picker: '../lib/picker',
+        pickerdate: '../lib/picker.date',
         firebase: 'https://www.gstatic.com/firebasejs/4.1.3/firebase'
     },
     config: {

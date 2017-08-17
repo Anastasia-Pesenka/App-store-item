@@ -1,4 +1,4 @@
-define(['modules/home', 'modules/tabAbout', 'modules/profile', 'modules/addingItemMenu'], function (home, about, profile, addingItemMenu) {
+define(['modules/home', 'modules/tabAbout', 'modules/profile', 'modules/addingItemMenu', 'modules/settingsPanel'], function (home, about, profile, addingItemMenu, settingsPanel) {
     return {
         currentRout: {},
         routes: [
@@ -40,11 +40,14 @@ define(['modules/home', 'modules/tabAbout', 'modules/profile', 'modules/addingIt
                 onEnter: function (user) {
                     console.log('onEnter home');
                     addingItemMenu.init();
+                    settingsPanel.init();
                     profile.init(user);
+
                 },
                 onLeave: function () {
                     console.log('onLeave home');
                     addingItemMenu.clear();
+                    settingsPanel.clear();
                     profile.clear();
                 }
             }

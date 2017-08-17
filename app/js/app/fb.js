@@ -4,6 +4,7 @@ define(['firebase', 'module', 'radio', 'util'], function (firebase, module, radi
             firebase.initializeApp(module.config());
             this.authenticated = firebase.auth().currentUser || null;
             this.initialized = false;
+            this.snapshotDB={};
             this.setupEvents();
         },
         setupEvents: function () {
@@ -35,8 +36,9 @@ define(['firebase', 'module', 'radio', 'util'], function (firebase, module, radi
         },
         getDBSnapshot : function () {
             firebase.database().ref('/users/' + this.authenticated.uid + '/info').once('value').then(function(snapshot) {
-                return snapshot.val()
-            });
+                this.snapshotDB = snapshot.val()
+            }.bind(this));
+            return this.snapshotDB;
         },
         signIn: function () {
             var provider = new firebase.auth.GoogleAuthProvider();

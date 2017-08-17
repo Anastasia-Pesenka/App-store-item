@@ -19,6 +19,11 @@
                 <%- items[id].description %>
               </span>
                         </div>
+                        <div class="panel-block-item">
+                            <span class="likes">
+                               Дата вывоза: <%- items[id].dateLabel %>
+                            </span>
+                        </div>
                     </div>
                     <footer class="card-footer">
                         <a class="card-footer-item del" data-id="<%= id %>" data-path="<%= items[id].ref.fullPath %>" >Delete</a>
