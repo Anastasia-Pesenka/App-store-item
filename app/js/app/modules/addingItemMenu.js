@@ -45,7 +45,6 @@ define(['picker', 'pickerdate', 'fb', 'radio', 'util', 'underscore', 'text!templ
                 }
             },
             addTask: function (imgRef) {
-                debugger;
                 var info = $('.item-info').get(0).value;
                 var dateLabel =  $("#datepicker").get(0).value;
                 if (imgRef && info) {

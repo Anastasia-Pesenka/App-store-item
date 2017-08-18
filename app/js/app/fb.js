@@ -48,8 +48,7 @@ define(['firebase', 'module', 'radio', 'util'], function (firebase, module, radi
                 // The signed-in user info.
                 var user = result.user;
             }.bind(this)).catch(function (error) {
-                // Handle Errors here.
-                debugger;
+                // Handle Errors here
                 var errorCode = error.code;
                 var errorMessage = error.message;
                 // The email of the user's account used.
@@ -60,9 +59,8 @@ define(['firebase', 'module', 'radio', 'util'], function (firebase, module, radi
         },
         signOut : function () {
             firebase.auth().signOut().then(function() {
-                this.userIsAuth=null;
+                // Sign-out successful.
             }.bind(this)).catch(function(error) {
-
                 // An error happened.
             });
         },

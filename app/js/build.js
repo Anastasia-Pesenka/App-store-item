@@ -79,8 +79,7 @@ define('fb',['firebase', 'module', 'radio', 'util'], function (firebase, module,
                 // The signed-in user info.
                 var user = result.user;
             }.bind(this)).catch(function (error) {
-                // Handle Errors here.
-                debugger;
+                // Handle Errors here
                 var errorCode = error.code;
                 var errorMessage = error.message;
                 // The email of the user's account used.
@@ -91,9 +90,8 @@ define('fb',['firebase', 'module', 'radio', 'util'], function (firebase, module,
         },
         signOut : function () {
             firebase.auth().signOut().then(function() {
-                this.userIsAuth=null;
+                // Sign-out successful.
             }.bind(this)).catch(function(error) {
-
                 // An error happened.
             });
         },
@@ -4797,7 +4795,6 @@ define('modules/addingItemMenu',['picker', 'pickerdate', 'fb', 'radio', 'util', 
                 }
             },
             addTask: function (imgRef) {
-                debugger;
                 var info = $('.item-info').get(0).value;
                 var dateLabel =  $("#datepicker").get(0).value;
                 if (imgRef && info) {
