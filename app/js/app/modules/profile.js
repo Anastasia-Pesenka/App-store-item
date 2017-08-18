@@ -44,9 +44,14 @@ define(['fb', 'radio', 'underscore', 'text!templates/profile.html', 'jquery', 'j
                 var user = fb.getCurrentUser();
                 this.allItems = fb.getDBSnapshot();
                 console.log(this.allItems);
-                /*for (var id in this.allItems) {
-                 console.log(this.allItems[id].date);
-                 }*/
+                for (var id in this.allItems) {
+                 if(this.allItems[id].date >= date.minDate.select && this.allItems[id].date <= date.maxDate.select) {
+                     this.sortingItems[id]=this.allItems[id]
+                 }
+                 }
+                console.log(this.sortingItems);
+                this.render(this.sortingItems, user);
+                this.sortingItems = {};
             }
         }
     });

@@ -2220,9 +2220,14 @@ define('modules/profile',['fb', 'radio', 'underscore', 'text!templates/profile.h
                 var user = fb.getCurrentUser();
                 this.allItems = fb.getDBSnapshot();
                 console.log(this.allItems);
-                /*for (var id in this.allItems) {
-                 console.log(this.allItems[id].date);
-                 }*/
+                for (var id in this.allItems) {
+                 if(this.allItems[id].date >= date.minDate.select && this.allItems[id].date <= date.maxDate.select) {
+                     this.sortingItems[id]=this.allItems[id]
+                 }
+                 }
+                console.log(this.sortingItems);
+                this.render(this.sortingItems, user);
+                this.sortingItems = {};
             }
         }
     });
@@ -4817,7 +4822,7 @@ define('modules/addingItemMenu',['picker', 'pickerdate', 'fb', 'radio', 'util', 
         }
     });
 
-define('text!templates/settingsPanel.html',[],function () { return '<div class="nav menu columns is-centered">\r\n    <div class="field column is-half is-narrow">\r\n        <h1 class="title">\r\n            Параметры отображения\r\n        </h1>\r\n        Отобразить с:\r\n        <input class="is-primary" type="text" placeholder="Введите дату" id="datepicker1">\r\n        по:\r\n        <input class="is-primary" type="text" placeholder="Введите дату" id="datepicker2">\r\n        <div class="column">\r\n            <a class="button is-info is-outlined sort">Отобразить</a>\r\n        </div>\r\n    </div>\r\n</div>';});
+define('text!templates/settingsPanel.html',[],function () { return '<div class="nav menu columns is-centered">\r\n    <div class="field column is-half is-narrow">\r\n        <h1 class="title">\r\n            Параметры отображения\r\n        </h1>\r\n        Отобразить с:\r\n        <input class="is-primary" type="text" placeholder="Введите дату" id="datepicker1">\r\n        по:\r\n        <input class="is-primary" type="text" placeholder="Введите дату" id="datepicker2">\r\n        <div class="column">\r\n            <a class="button is-info is-outlined sort">Отобразить</a>\r\n        </div>\r\n    </div>\r\n</div>\r\n<div class="modal">\r\n    <div class="modal-background"></div>\r\n    <div class="modal-card">\r\n        <header class="modal-card-head">\r\n            <p class="modal-card-title">Ошибка!</p>\r\n            <button class="delete close" aria-label="close"></button>\r\n        </header>\r\n        <section class="modal-card-body is-centered">\r\n            <div class="card">\r\n                <div class="card-content">\r\n                    <div class="content">\r\n                        Проверьте правильность ввода даты.\r\n                    </div>\r\n                </div>\r\n            </div>\r\n        </section>\r\n\r\n    </div>\r\n</div>';});
 
 define('modules/settingsPanel',['picker', 'pickerdate', 'fb', 'radio', 'underscore', 'text!templates/settingsPanel.html', 'jquery'],
 function (picker, pickerdate, fb, radio, _, settingsPanelTpl, $) {
@@ -4861,7 +4866,14 @@ function (picker, pickerdate, fb, radio, _, settingsPanelTpl, $) {
         },
         clickHandler: function (e) {
           if($(e.target).is('.sort')){
-              radio.trigger('date/sort', this.dateMimMax)
+              if(this.dateMimMax.minDate.select > this.dateMimMax.maxDate.select) {
+                  $(".modal").addClass("is-active");
+              } else {
+                  radio.trigger('date/sort', this.dateMimMax);
+              }
+          }
+          if($(e.target).is('.close')) {
+              $(".modal").removeClass("is-active");
           }
         },
         clear : function () {

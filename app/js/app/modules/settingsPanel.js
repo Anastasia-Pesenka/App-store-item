@@ -40,7 +40,14 @@ function (picker, pickerdate, fb, radio, _, settingsPanelTpl, $) {
         },
         clickHandler: function (e) {
           if($(e.target).is('.sort')){
-              radio.trigger('date/sort', this.dateMimMax)
+              if(this.dateMimMax.minDate.select > this.dateMimMax.maxDate.select) {
+                  $(".modal").addClass("is-active");
+              } else {
+                  radio.trigger('date/sort', this.dateMimMax);
+              }
+          }
+          if($(e.target).is('.close')) {
+              $(".modal").removeClass("is-active");
           }
         },
         clear : function () {
