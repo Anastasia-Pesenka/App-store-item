@@ -2172,7 +2172,7 @@ define('modules/tabAbout',['fb', 'radio', 'underscore', 'text!templates/tabAbout
         }
     });
 
-define('text!templates/profile.html',[],function () { return '<div class="container is-centered">\r\n    <% if (user) {%>\r\n        <% var count = 0; %>\r\n\r\n            <% for (var id in items){ %>\r\n        <% if( count===0 ) { %>\r\n        <div class="columns">\r\n            <% } %>\r\n            <div class="column is-4" >\r\n                <div class="card">\r\n                    <div class="card-image">\r\n                        <figure class="image is-4by3">\r\n                            <img src="<%= items[id].ref.downloadURL %>" alt="Image">\r\n                        </figure>\r\n                    </div>\r\n                    <div class="card-content">\r\n                        <div class="panel-block-item ">\r\n              <span class="likes">\r\n                <%- items[id].description %>\r\n              </span>\r\n                        </div>\r\n                        <div class="panel-block-item">\r\n                            <span class="likes">\r\n                               Дата вывоза: <%- items[id].dateLabel %>\r\n                            </span>\r\n                        </div>\r\n                    </div>\r\n                    <footer class="card-footer">\r\n                        <a class="card-footer-item del" data-id="<%= id %>" data-path="<%= items[id].ref.fullPath %>" >Delete</a>\r\n                    </footer>\r\n                </div>\r\n            </div>\r\n            <% count++; %>\r\n            <% if( count%3===0 && count!=0 ) { %>\r\n        </div><div class="columns">\r\n        <% } %>\r\n\r\n            <% } %>\r\n\r\n\r\n    <% } %>\r\n</div>';});
+define('text!templates/profile.html',[],function () { return '<div class="container is-centered">\r\n    <% if (user) {%>\r\n        <% var count = 0; %>\r\n\r\n            <% for (var id in items){ %>\r\n        <% if( count===0 ) { %>\r\n        <div class="columns">\r\n            <% } %>\r\n            <div class="column is-4" >\r\n                <div class="card">\r\n                    <div class="card-image">\r\n                        <figure class="image is-4by3">\r\n                            <img src="<%= items[id].ref.downloadURL %>" alt="Image">\r\n                        </figure>\r\n                    </div>\r\n                    <div class="card-content">\r\n                        <div class="panel-block-item ">\r\n              <span class="likes">\r\n                <%- items[id].description %>\r\n              </span>\r\n                        </div>\r\n                        <div class="panel-block-item">\r\n                            <span class="likes">\r\n                               Дата вывоза: <%- items[id].dateLabel %>\r\n                            </span>\r\n                        </div>\r\n                    </div>\r\n                    <footer class="card-footer">\r\n                        <a class="card-footer-item del" data-id="<%= id %>" data-path="<%= items[id].ref.fullPath %>" >Delete</a>\r\n                    </footer>\r\n                </div>\r\n            </div>\r\n            <% count++; %>\r\n            <% if( count%3===0 && count!=0 ) { %>\r\n        </div><div class="columns">\r\n        <% } %>\r\n\r\n            <% } %>\r\n\r\n\r\n    <% } %>\r\n</div>\r\n';});
 
 define('modules/profile',['fb', 'radio', 'underscore', 'text!templates/profile.html', 'jquery', 'jqueryui'],
     function (fb, radio, _, profileTpl, $) {
@@ -4751,46 +4751,69 @@ Picker.extend( 'pickadate', DatePicker )
 
 
 
-define('text!templates/addingItemMenu.html',[],function () { return '<div class="nav menu columns is-centered">\r\n\r\n    <div class="field column is-half is-narrow">\r\n        <h1 class="title">\r\n            Добавление новой вещи\r\n        </h1>\r\n        <div class="control">\r\n            <input class="input is-primary item-info" type="text" placeholder="Введите описание">\r\n            <input class="is-primary" type="text" placeholder="Введите дату" id="datepicker">\r\n            <input type="file" class="input-files" multiple accept="image/jpeg,image/png">\r\n        </div>\r\n\r\n\r\n        <a class="nav-item is-tab column is-3">\r\n        <span class="icon-btn add">\r\n            <i class="fa fa-plus"></i>\r\n        </span>\r\n            <strong class="add " style="color: white; padding-left: 7px">Добавить</strong>\r\n        </a>\r\n    </div>\r\n</div>\r\n';});
+define('text!templates/addingItemMenu.html',[],function () { return '<div class="nav menu columns is-centered">\r\n\r\n    <div class="field column is-half is-narrow">\r\n        <h1 class="title">\r\n            Добавление новой вещи\r\n        </h1>\r\n        <div class="control">\r\n            <input class="input is-primary item-info" type="text" placeholder="Введите описание">\r\n            <input class="is-primary" type="text" placeholder="Введите дату" id="datepicker">\r\n            <input type="file" class="input-files" multiple accept="image/jpeg,image/png">\r\n        </div>\r\n        <div class="column container map">\r\n            <p>Выберите место в сторке поиска</p>\r\n            <div id="small-map" style="width: 400px; height: 200px"></div>\r\n        </div>\r\n\r\n\r\n        <a class="nav-item is-tab column is-3">\r\n        <span class="icon-btn add">\r\n            <i class="fa fa-plus"></i>\r\n        </span>\r\n            <strong class="add " style="color: white; padding-left: 7px">Добавить</strong>\r\n        </a>\r\n\r\n    </div>\r\n</div>\r\n';});
 
 define('modules/addingItemMenu',['picker', 'pickerdate', 'fb', 'radio', 'util', 'underscore', 'text!templates/addingItemMenu.html', 'jquery'],
-    function (picker, pickerdate, fb, radio, util, _,  addingItemMenuTpl, $) {
+    function (picker, pickerdate, fb, radio, util, _, addingItemMenuTpl, $) {
         return {
-            init : function () {
+            init: function () {
                 this.template = _.template(addingItemMenuTpl);
                 this.$el = $(".addingItemMenu");
                 this.selectedDate = {};
                 this.render();
                 this.setupEvents();
             },
-            render : function () {
-                this.$el.html(this.template()) ;
+            render: function () {
+                this.$el.html(this.template());
                 this.setPicker();
+                this.initMap();
             },
-            setPicker : function () {
+            setPicker: function () {
                 $("#datepicker").pickadate({
-                    monthsFull: [ 'января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря' ],
-                    monthsShort: [ 'янв', 'фев', 'мар', 'апр', 'май', 'июн', 'июл', 'авг', 'сен', 'окт', 'ноя', 'дек' ],
-                    weekdaysFull: [ 'воскресенье', 'понедельник', 'вторник', 'среда', 'четверг', 'пятница', 'суббота' ],
-                    weekdaysShort: [ 'вс', 'пн', 'вт', 'ср', 'чт', 'пт', 'сб' ],
+                    monthsFull: ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'],
+                    monthsShort: ['янв', 'фев', 'мар', 'апр', 'май', 'июн', 'июл', 'авг', 'сен', 'окт', 'ноя', 'дек'],
+                    weekdaysFull: ['воскресенье', 'понедельник', 'вторник', 'среда', 'четверг', 'пятница', 'суббота'],
+                    weekdaysShort: ['вс', 'пн', 'вт', 'ср', 'чт', 'пт', 'сб'],
                     today: 'сегодня',
                     clear: 'удалить',
                     close: 'закрыть',
                     firstDay: 1,
                     format: 'd mmmm yyyy г.',
                     formatSubmit: 'yyyy/mm/dd',
-                    onSet: function(context) {
+                    onSet: function (context) {
                         console.log('Just set stuff:', context, this);
                         this.selectedDate = context;
                     }.bind(this)
                 });
             },
-            setupEvents : function () {
+            initMap: function () {
+                this.myMap = new ymaps.Map("small-map", {
+                    center: [53.90, 27.55],
+                    zoom: 11,
+                    controls: []
+                });
+                this.searchControl = new ymaps.control.SearchControl({
+                    options: {
+                        provider: 'yandex#search'
+                    }
+                });
+                this.myMap.controls.add(this.searchControl);
+            },
+            setupEvents: function () {
+                this.searchControl.events.add('resultselect', this.resultselectHandler.bind(this));
                 this.$el.on('click', this.addHandler.bind(this));
             },
-            addHandler : function (e) {
-                if($(e.target).is('.add')){
-                    var input= $('.input-files').get(0);
+            resultselectHandler: function (e) {
+                // Получаем массив результатов.
+                this.results = this.searchControl.getResultsArray(),
+                    // Индекс выбранного объекта.
+                    this.selected = e.get('index'),
+                    // Получаем координаты выбранного объекта.
+                    this.point = this.results[this.selected].geometry.getCoordinates();
+            },
+            addHandler: function (e) {
+                if ($(e.target).is('.add')) {
+                    var input = $('.input-files').get(0);
                     var file = input.files;
                     for (var i = 0; i < file.length; i++) {
                         fb.saveFile(file[i]);
@@ -4801,13 +4824,14 @@ define('modules/addingItemMenu',['picker', 'pickerdate', 'fb', 'radio', 'util', 
             },
             addTask: function (imgRef) {
                 var info = $('.item-info').get(0).value;
-                var dateLabel =  $("#datepicker").get(0).value;
+                var dateLabel = $("#datepicker").get(0).value;
                 if (imgRef && info) {
                     var id = util.generateId();
                     var data = {
                         description: info,
                         date: this.selectedDate.select,
                         dateLabel: dateLabel,
+                        itemCoordinates: this.point,
                         ref: imgRef
                     };
                     fb.saveItemInfo(id, data);
@@ -4816,73 +4840,121 @@ define('modules/addingItemMenu',['picker', 'pickerdate', 'fb', 'radio', 'util', 
                 $(".item-info").val("");
                 $("#datepicker").val("");
             },
-            clear : function () {
-                this.$el.html('') ;
+            clear: function () {
+                this.$el.html('');
             }
         }
     });
 
 define('text!templates/settingsPanel.html',[],function () { return '<div class="nav menu columns is-centered">\r\n    <div class="field column is-half is-narrow">\r\n        <h1 class="title">\r\n            Параметры отображения\r\n        </h1>\r\n        Отобразить с:\r\n        <input class="is-primary" type="text" placeholder="Введите дату" id="datepicker1">\r\n        по:\r\n        <input class="is-primary" type="text" placeholder="Введите дату" id="datepicker2">\r\n        <div class="column">\r\n            <a class="button is-info is-outlined sort">Отобразить</a>\r\n        </div>\r\n    </div>\r\n</div>\r\n<div class="modal">\r\n    <div class="modal-background"></div>\r\n    <div class="modal-card">\r\n        <header class="modal-card-head">\r\n            <p class="modal-card-title">Ошибка!</p>\r\n            <button class="delete close" aria-label="close"></button>\r\n        </header>\r\n        <section class="modal-card-body is-centered">\r\n            <div class="card">\r\n                <div class="card-content">\r\n                    <div class="content">\r\n                        Проверьте правильность ввода даты.\r\n                    </div>\r\n                </div>\r\n            </div>\r\n        </section>\r\n\r\n    </div>\r\n</div>';});
 
-define('modules/settingsPanel',['picker', 'pickerdate', 'fb', 'radio', 'underscore', 'text!templates/settingsPanel.html', 'jquery'],
-function (picker, pickerdate, fb, radio, _, settingsPanelTpl, $) {
-    return{
-        init : function () {
-            this.template = _.template(settingsPanelTpl);
-            this.$el = $(".settingPanel");
-            this.dateMimMax = {minDate : {}, maxDate : {}};
-            this.render();
-            this.setupEvents();
-        },
-        render : function () {
-            this.$el.html(this.template()) ;
-            this.setPickers();
-        },
-        setPickers: function () {
-            this.setPickerWithOwnProp("#datepicker1", 'min');
-            this.setPickerWithOwnProp("#datepicker2", 'max');
-        },
-        setPickerWithOwnProp : function (selector, value) {
-            $(selector).pickadate({
-                monthsFull: [ 'января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря' ],
-                monthsShort: [ 'янв', 'фев', 'мар', 'апр', 'май', 'июн', 'июл', 'авг', 'сен', 'окт', 'ноя', 'дек' ],
-                weekdaysFull: [ 'воскресенье', 'понедельник', 'вторник', 'среда', 'четверг', 'пятница', 'суббота' ],
-                weekdaysShort: [ 'вс', 'пн', 'вт', 'ср', 'чт', 'пт', 'сб' ],
-                today: 'сегодня',
-                clear: 'удалить',
-                close: 'закрыть',
-                firstDay: 1,
-                format: 'd mmmm yyyy г.',
-                formatSubmit: 'yyyy/mm/dd',
-                onSet: function(context) {
-                    console.log('Just set stuff:', context);
-                    if(value==='min') {this.dateMimMax.minDate = context}
-                    if(value==='max') {this.dateMimMax.maxDate = context}
-                }.bind(this)
-            });
-        },
-        setupEvents: function () {
-            this.$el.on('click', this.clickHandler.bind(this));
-        },
-        clickHandler: function (e) {
-          if($(e.target).is('.sort')){
-              if(this.dateMimMax.minDate.select > this.dateMimMax.maxDate.select) {
-                  $(".modal").addClass("is-active");
-              } else {
-                  radio.trigger('date/sort', this.dateMimMax);
-              }
-          }
-          if($(e.target).is('.close')) {
-              $(".modal").removeClass("is-active");
-          }
-        },
-        clear : function () {
-            this.$el.html('') ;
+define('modules/settingsPanel',['picker', 'pickerdate', 'radio', 'underscore', 'text!templates/settingsPanel.html', 'jquery'],
+    function (picker, pickerdate, radio, _, settingsPanelTpl, $) {
+        return {
+            init: function () {
+                this.template = _.template(settingsPanelTpl);
+                this.$el = $(".settingPanel");
+                this.dateMimMax = {minDate: {}, maxDate: {}};
+                this.render();
+                this.setupEvents();
+            },
+            render: function () {
+                this.$el.html(this.template());
+                this.setPickers();
+            },
+            setPickers: function () {
+                this.setPickerWithOwnProp("#datepicker1", 'min');
+                this.setPickerWithOwnProp("#datepicker2", 'max');
+            },
+            setPickerWithOwnProp: function (selector, value) {
+                $(selector).pickadate({
+                    monthsFull: ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'],
+                    monthsShort: ['янв', 'фев', 'мар', 'апр', 'май', 'июн', 'июл', 'авг', 'сен', 'окт', 'ноя', 'дек'],
+                    weekdaysFull: ['воскресенье', 'понедельник', 'вторник', 'среда', 'четверг', 'пятница', 'суббота'],
+                    weekdaysShort: ['вс', 'пн', 'вт', 'ср', 'чт', 'пт', 'сб'],
+                    today: 'сегодня',
+                    clear: 'удалить',
+                    close: 'закрыть',
+                    firstDay: 1,
+                    format: 'd mmmm yyyy г.',
+                    formatSubmit: 'yyyy/mm/dd',
+                    onSet: function (context) {
+                        console.log('Just set stuff:', context);
+                        if (value === 'min') {
+                            this.dateMimMax.minDate = context
+                        }
+                        if (value === 'max') {
+                            this.dateMimMax.maxDate = context
+                        }
+                    }.bind(this)
+                });
+            },
+            setupEvents: function () {
+                this.$el.on('click', this.clickHandler.bind(this));
+            },
+            clickHandler: function (e) {
+                if ($(e.target).is('.sort')) {
+                    if (this.dateMimMax.minDate.select > this.dateMimMax.maxDate.select) {
+                        $(".modal").addClass("is-active");
+                    } else {
+                        radio.trigger('date/sort', this.dateMimMax);
+                    }
+                }
+                if ($(e.target).is('.close')) {
+                    $(".modal").removeClass("is-active");
+                }
+            },
+            clear: function () {
+                this.$el.html('');
+            }
+        }
+    });
+define('modules/map',['radio', 'underscore', 'jquery', 'fb'],
+    function (radio, _, $, fb) {
+        return{
+            init : function () {
+                this.$el = $(".map");
+                this.myMap = new ymaps.Map("map", {
+                    center: [53.90, 27.55],
+                    zoom: 11
+                });
+                this.setupEvents();
+            },
+            setupEvents: function () {
+                radio.on('auth/changed', this.authChangeHandler.bind(this));
+                radio.on('item/got', this.renderPlacemarks.bind(this));
+            },
+            authChangeHandler: function (user) {
+                if(user) {
+                    setTimeout( function() {
+                        this.initialCoordinates=fb.getDBSnapshot();
+                        this.createPlacemarks(this.initialCoordinates);
+                        }.bind(this), 3000);
+                } else {
+                    this.createPlacemarks(null);
+                }
+            },
+            renderPlacemarks: function (items) {
+                this.createPlacemarks(items);
+            },
+            createPlacemarks: function (items) {
+                this.myMap.geoObjects.removeAll();
+                for (var id in items) {
+                    var myPlacemark = new ymaps.Placemark(items[id].itemCoordinates, {
+                        hintContent: items[id].description,
+                        balloonContent: items[id].description
+                    });
+                    this.myMap.geoObjects.add(myPlacemark);
+                }
+            },
+            clear : function () {
+                this.myMap.destroy();
+                this.$el.html('') ;
+            }
         }
     }
-    }
 );
-define('router',['modules/home', 'modules/tabAbout', 'modules/profile', 'modules/addingItemMenu', 'modules/settingsPanel'], function (home, about, profile, addingItemMenu, settingsPanel) {
+define('router',['modules/home', 'modules/tabAbout', 'modules/profile', 'modules/addingItemMenu', 'modules/settingsPanel', 'modules/map'], function (home, about, profile, addingItemMenu, settingsPanel, map) {
     return {
         currentRout: {},
         routes: [
@@ -4926,6 +4998,7 @@ define('router',['modules/home', 'modules/tabAbout', 'modules/profile', 'modules
                     addingItemMenu.init();
                     settingsPanel.init();
                     profile.init(user);
+                    map.init();
 
                 },
                 onLeave: function () {
@@ -4933,6 +5006,7 @@ define('router',['modules/home', 'modules/tabAbout', 'modules/profile', 'modules
                     addingItemMenu.clear();
                     settingsPanel.clear();
                     profile.clear();
+                    map.clear();
                 }
             }
         ],

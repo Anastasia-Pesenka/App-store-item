@@ -1,4 +1,4 @@
-define(['modules/home', 'modules/tabAbout', 'modules/profile', 'modules/addingItemMenu', 'modules/settingsPanel'], function (home, about, profile, addingItemMenu, settingsPanel) {
+define(['modules/home', 'modules/tabAbout', 'modules/profile', 'modules/addingItemMenu', 'modules/settingsPanel', 'modules/map'], function (home, about, profile, addingItemMenu, settingsPanel, map) {
     return {
         currentRout: {},
         routes: [
@@ -42,6 +42,7 @@ define(['modules/home', 'modules/tabAbout', 'modules/profile', 'modules/addingIt
                     addingItemMenu.init();
                     settingsPanel.init();
                     profile.init(user);
+                    map.init();
 
                 },
                 onLeave: function () {
@@ -49,6 +50,7 @@ define(['modules/home', 'modules/tabAbout', 'modules/profile', 'modules/addingIt
                     addingItemMenu.clear();
                     settingsPanel.clear();
                     profile.clear();
+                    map.clear();
                 }
             }
         ],
