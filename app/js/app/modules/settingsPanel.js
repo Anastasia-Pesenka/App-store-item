@@ -45,12 +45,12 @@ define(['picker', 'pickerdate', 'radio', 'underscore', 'text!templates/settingsP
             clickHandler: function (e) {
                 if ($(e.target).is('.sort')) {
                     if (this.dateMimMax.minDate.select > this.dateMimMax.maxDate.select) {
-                        $(".modal").addClass("is-active");
+                        $("#modal-warn").addClass("is-active");
                     } else {
                         radio.trigger('date/sort', this.dateMimMax);
                     }
                 }
-                if ($(e.target).is('.close')) {
+                if ($(e.target).is('#close-warn')) {
                     $(".modal").removeClass("is-active");
                 }
             },

@@ -5,6 +5,7 @@ define(['picker', 'pickerdate', 'fb', 'radio', 'util', 'underscore', 'text!templ
                 this.template = _.template(addingItemMenuTpl);
                 this.$el = $(".addingItemMenu");
                 this.selectedDate = {};
+                this.point=[];
                 this.render();
                 this.setupEvents();
             },
@@ -46,6 +47,7 @@ define(['picker', 'pickerdate', 'fb', 'radio', 'util', 'underscore', 'text!templ
             },
             setupEvents: function () {
                 this.searchControl.events.add('resultselect', this.resultselectHandler.bind(this));
+                this.searchControl.events.add('clear', this.clearHandler.bind(this));
                 this.$el.on('click', this.addHandler.bind(this));
             },
             resultselectHandler: function (e) {
@@ -56,15 +58,24 @@ define(['picker', 'pickerdate', 'fb', 'radio', 'util', 'underscore', 'text!templ
                     // Получаем координаты выбранного объекта.
                     this.point = this.results[this.selected].geometry.getCoordinates();
             },
+            clearHandler: function () {
+                this.point=[];
+            },
             addHandler: function (e) {
                 if ($(e.target).is('.add')) {
                     var input = $('.input-files').get(0);
                     var file = input.files;
-                    for (var i = 0; i < file.length; i++) {
-                        fb.saveFile(file[i]);
+                    if($('.item-info').get(0).value && $("#datepicker").get(0).value && file.length && this.point.length) {
+                        for (var i = 0; i < file.length; i++) {
+                            fb.saveFile(file[i]);
+                        }
+                        radio.on('img/save', this.addTask.bind(this));
+                    } else {
+                        $("#modal-val").addClass("is-active");
                     }
-                    radio.on('img/save', this.addTask.bind(this));
-
+                }
+                if ($(e.target).is('#close-val')) {
+                    $(".modal").removeClass("is-active");
                 }
             },
             addTask: function (imgRef) {
@@ -84,6 +95,7 @@ define(['picker', 'pickerdate', 'fb', 'radio', 'util', 'underscore', 'text!templ
                 $(".input-files").val("");
                 $(".item-info").val("");
                 $("#datepicker").val("");
+                this.searchControl.clear();
             },
             clear: function () {
                 this.$el.html('');

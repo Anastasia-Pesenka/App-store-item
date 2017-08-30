@@ -4751,7 +4751,7 @@ Picker.extend( 'pickadate', DatePicker )
 
 
 
-define('text!templates/addingItemMenu.html',[],function () { return '<div class="nav menu columns is-centered">\r\n\r\n    <div class="field column is-half is-narrow">\r\n        <h1 class="title">\r\n            Добавление новой вещи\r\n        </h1>\r\n        <div class="control">\r\n            <input class="input is-primary item-info" type="text" placeholder="Введите описание">\r\n            <input class="is-primary" type="text" placeholder="Введите дату" id="datepicker">\r\n            <input type="file" class="input-files" multiple accept="image/jpeg,image/png">\r\n        </div>\r\n        <div class="column container map">\r\n            <p>Выберите место в сторке поиска</p>\r\n            <div id="small-map" style="width: 400px; height: 200px"></div>\r\n        </div>\r\n\r\n\r\n        <a class="nav-item is-tab column is-3">\r\n        <span class="icon-btn add">\r\n            <i class="fa fa-plus"></i>\r\n        </span>\r\n            <strong class="add " style="color: white; padding-left: 7px">Добавить</strong>\r\n        </a>\r\n\r\n    </div>\r\n</div>\r\n';});
+define('text!templates/addingItemMenu.html',[],function () { return '<div class="nav menu columns is-centered">\r\n\r\n    <div class="field column is-half is-narrow">\r\n        <h1 class="title">\r\n            Добавление новой вещи\r\n        </h1>\r\n        <div class="control">\r\n            <input class="input is-primary item-info" type="text" placeholder="Введите описание">\r\n            <input class="is-primary" type="text" placeholder="Введите дату" id="datepicker">\r\n            <input type="file" class="input-files" multiple accept="image/jpeg,image/png">\r\n        </div>\r\n        <div class="column container map">\r\n            <p>Выберите место в сторке поиска</p>\r\n            <div id="small-map" style="width: 400px; height: 200px"></div>\r\n        </div>\r\n\r\n\r\n        <a class="nav-item is-tab column is-3">\r\n        <span class="icon-btn add">\r\n            <i class="fa fa-plus"></i>\r\n        </span>\r\n            <strong class="add " style="color: white; padding-left: 7px">Добавить</strong>\r\n        </a>\r\n\r\n    </div>\r\n</div>\r\n<div id="modal-val" class="modal">\r\n    <div class="modal-background"></div>\r\n    <div class="modal-card">\r\n        <header class="modal-card-head">\r\n            <p class="modal-card-title">Ошибка!</p>\r\n            <button id="close-val" class="delete close" aria-label="close"></button>\r\n        </header>\r\n        <section class="modal-card-body is-centered">\r\n            <div class="card">\r\n                <div class="card-content">\r\n                    <div class="content">\r\n                        Проверьте, заполнены ли все поля формы.\r\n                    </div>\r\n                </div>\r\n            </div>\r\n        </section>\r\n\r\n    </div>\r\n</div>\r\n';});
 
 define('modules/addingItemMenu',['picker', 'pickerdate', 'fb', 'radio', 'util', 'underscore', 'text!templates/addingItemMenu.html', 'jquery'],
     function (picker, pickerdate, fb, radio, util, _, addingItemMenuTpl, $) {
@@ -4760,6 +4760,7 @@ define('modules/addingItemMenu',['picker', 'pickerdate', 'fb', 'radio', 'util', 
                 this.template = _.template(addingItemMenuTpl);
                 this.$el = $(".addingItemMenu");
                 this.selectedDate = {};
+                this.point=[];
                 this.render();
                 this.setupEvents();
             },
@@ -4801,6 +4802,7 @@ define('modules/addingItemMenu',['picker', 'pickerdate', 'fb', 'radio', 'util', 
             },
             setupEvents: function () {
                 this.searchControl.events.add('resultselect', this.resultselectHandler.bind(this));
+                this.searchControl.events.add('clear', this.clearHandler.bind(this));
                 this.$el.on('click', this.addHandler.bind(this));
             },
             resultselectHandler: function (e) {
@@ -4811,15 +4813,24 @@ define('modules/addingItemMenu',['picker', 'pickerdate', 'fb', 'radio', 'util', 
                     // Получаем координаты выбранного объекта.
                     this.point = this.results[this.selected].geometry.getCoordinates();
             },
+            clearHandler: function () {
+                this.point=[];
+            },
             addHandler: function (e) {
                 if ($(e.target).is('.add')) {
                     var input = $('.input-files').get(0);
                     var file = input.files;
-                    for (var i = 0; i < file.length; i++) {
-                        fb.saveFile(file[i]);
+                    if($('.item-info').get(0).value && $("#datepicker").get(0).value && file.length && this.point.length) {
+                        for (var i = 0; i < file.length; i++) {
+                            fb.saveFile(file[i]);
+                        }
+                        radio.on('img/save', this.addTask.bind(this));
+                    } else {
+                        $("#modal-val").addClass("is-active");
                     }
-                    radio.on('img/save', this.addTask.bind(this));
-
+                }
+                if ($(e.target).is('#close-val')) {
+                    $(".modal").removeClass("is-active");
                 }
             },
             addTask: function (imgRef) {
@@ -4839,6 +4850,7 @@ define('modules/addingItemMenu',['picker', 'pickerdate', 'fb', 'radio', 'util', 
                 $(".input-files").val("");
                 $(".item-info").val("");
                 $("#datepicker").val("");
+                this.searchControl.clear();
             },
             clear: function () {
                 this.$el.html('');
@@ -4846,7 +4858,7 @@ define('modules/addingItemMenu',['picker', 'pickerdate', 'fb', 'radio', 'util', 
         }
     });
 
-define('text!templates/settingsPanel.html',[],function () { return '<div class="nav menu columns is-centered">\r\n    <div class="field column is-half is-narrow">\r\n        <h1 class="title">\r\n            Параметры отображения\r\n        </h1>\r\n        Отобразить с:\r\n        <input class="is-primary" type="text" placeholder="Введите дату" id="datepicker1">\r\n        по:\r\n        <input class="is-primary" type="text" placeholder="Введите дату" id="datepicker2">\r\n        <div class="column">\r\n            <a class="button is-info is-outlined sort">Отобразить</a>\r\n        </div>\r\n    </div>\r\n</div>\r\n<div class="modal">\r\n    <div class="modal-background"></div>\r\n    <div class="modal-card">\r\n        <header class="modal-card-head">\r\n            <p class="modal-card-title">Ошибка!</p>\r\n            <button class="delete close" aria-label="close"></button>\r\n        </header>\r\n        <section class="modal-card-body is-centered">\r\n            <div class="card">\r\n                <div class="card-content">\r\n                    <div class="content">\r\n                        Проверьте правильность ввода даты.\r\n                    </div>\r\n                </div>\r\n            </div>\r\n        </section>\r\n\r\n    </div>\r\n</div>';});
+define('text!templates/settingsPanel.html',[],function () { return '<div class="nav menu columns is-centered">\r\n    <div class="field column is-half is-narrow">\r\n        <h1 class="title">\r\n            Параметры отображения\r\n        </h1>\r\n        Отобразить с:\r\n        <input class="is-primary" type="text" placeholder="Введите дату" id="datepicker1">\r\n        по:\r\n        <input class="is-primary" type="text" placeholder="Введите дату" id="datepicker2">\r\n        <div class="column">\r\n            <a class="button is-info is-outlined sort">Отобразить</a>\r\n        </div>\r\n    </div>\r\n</div>\r\n<div id="modal-warn" class="modal">\r\n    <div class="modal-background"></div>\r\n    <div class="modal-card">\r\n        <header class="modal-card-head">\r\n            <p class="modal-card-title">Ошибка!</p>\r\n            <button id="close-warn" class="delete close" aria-label="close"></button>\r\n        </header>\r\n        <section class="modal-card-body is-centered">\r\n            <div class="card">\r\n                <div class="card-content">\r\n                    <div class="content">\r\n                        Проверьте правильность ввода даты.\r\n                    </div>\r\n                </div>\r\n            </div>\r\n        </section>\r\n\r\n    </div>\r\n</div>';});
 
 define('modules/settingsPanel',['picker', 'pickerdate', 'radio', 'underscore', 'text!templates/settingsPanel.html', 'jquery'],
     function (picker, pickerdate, radio, _, settingsPanelTpl, $) {
@@ -4895,12 +4907,12 @@ define('modules/settingsPanel',['picker', 'pickerdate', 'radio', 'underscore', '
             clickHandler: function (e) {
                 if ($(e.target).is('.sort')) {
                     if (this.dateMimMax.minDate.select > this.dateMimMax.maxDate.select) {
-                        $(".modal").addClass("is-active");
+                        $("#modal-warn").addClass("is-active");
                     } else {
                         radio.trigger('date/sort', this.dateMimMax);
                     }
                 }
-                if ($(e.target).is('.close')) {
+                if ($(e.target).is('#close-warn')) {
                     $(".modal").removeClass("is-active");
                 }
             },
@@ -4914,9 +4926,16 @@ define('modules/map',['radio', 'underscore', 'jquery', 'fb'],
         return{
             init : function () {
                 this.$el = $(".map");
+                this.myGeoObjects = [];
                 this.myMap = new ymaps.Map("map", {
                     center: [53.90, 27.55],
                     zoom: 11
+                });
+                this.clusterer = new ymaps.Clusterer({
+                    groupByCoordinates: false,
+                    clusterDisableClickZoom: true,
+                    clusterHideIconOnBalloonOpen: false,
+                    geoObjectHideIconOnBalloonOpen: false
                 });
                 this.setupEvents();
             },
@@ -4947,6 +4966,18 @@ define('modules/map',['radio', 'underscore', 'jquery', 'fb'],
                     this.myMap.geoObjects.add(myPlacemark);
                 }
             },
+            /*createPlacemarks: function (items) {
+                this.myMap.geoObjects.removeAll();
+                for (var id in items) {
+                    var myPlacemark = new ymaps.Placemark(items[id].itemCoordinates, {
+                        clusterCaption: items[id].description,
+                        balloonContent: items[id].description
+                    });
+                    this.myGeoObjects.push(myPlacemark);
+                }
+                this.clusterer.add(this.myGeoObjects);
+                this.myMap.geoObjects.add(this.clusterer);
+            },*/
             clear : function () {
                 this.myMap.destroy();
                 this.$el.html('') ;

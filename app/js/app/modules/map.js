@@ -3,9 +3,16 @@ define(['radio', 'underscore', 'jquery', 'fb'],
         return{
             init : function () {
                 this.$el = $(".map");
+                this.myGeoObjects = [];
                 this.myMap = new ymaps.Map("map", {
                     center: [53.90, 27.55],
                     zoom: 11
+                });
+                this.clusterer = new ymaps.Clusterer({
+                    groupByCoordinates: false,
+                    clusterDisableClickZoom: true,
+                    clusterHideIconOnBalloonOpen: false,
+                    geoObjectHideIconOnBalloonOpen: false
                 });
                 this.setupEvents();
             },
@@ -36,6 +43,18 @@ define(['radio', 'underscore', 'jquery', 'fb'],
                     this.myMap.geoObjects.add(myPlacemark);
                 }
             },
+            /*createPlacemarks: function (items) {
+                this.myMap.geoObjects.removeAll();
+                for (var id in items) {
+                    var myPlacemark = new ymaps.Placemark(items[id].itemCoordinates, {
+                        clusterCaption: items[id].description,
+                        balloonContent: items[id].description
+                    });
+                    this.myGeoObjects.push(myPlacemark);
+                }
+                this.clusterer.add(this.myGeoObjects);
+                this.myMap.geoObjects.add(this.clusterer);
+            },*/
             clear : function () {
                 this.myMap.destroy();
                 this.$el.html('') ;
